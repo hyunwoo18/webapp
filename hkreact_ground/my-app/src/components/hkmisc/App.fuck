@@ -1,0 +1,71 @@
+import React, { Component } from 'react';
+import { Route, withRouter } from 'react-router-dom';
+
+import LoginContainer from './LoginContainer';
+//import ChatContainer from './ChatContainer';
+import MainContainer from './MainContainer';
+//import SideContainer from './SideContainer';
+
+//import logo from './images/logo.svg';
+import fire from './fire';
+//import firebase from 'firebase';
+
+import './App.css';
+
+class App extends Component {
+    state = { user: null, messages: [], messagesLoaded: false };
+
+    mylater = () => {
+	console.log( "new hk 3" );
+
+	fire.auth().onAuthStateChanged(  user => {
+		if (user) {
+		    console.log( "fucking user exists" )
+		    //if (this.isMounted()) {
+		    if (this._isMounted) {
+			this.setState(  { user }  );
+			console.log( "new hk 4" );
+		    }
+		    //}
+		    console.log( user.email )
+		    //var hkuser = fire.auth().currentUser;
+		} else {  this.props.history.push('/login');     }
+	    }  );
+    }
+
+    componentDidMount() {
+	fire.auth().setPersistence( 'local' ).then( function() { console.log("persistence success"); } );
+	//fire.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then( function() { console.log("persistence success"); } );
+	//this._isMounted = true;
+	//console.log( "new hk 1" );
+	//this.mylater();
+	//console.log( "new hk 2" );
+
+	fire.auth().onAuthStateChanged(  user => {
+		if (user) {
+		    console.log( "fucking user exists" )
+		    //this.setState(  { user }  );
+		    console.log( user.email )
+		    //var hkuser = fire.auth().currentUser;
+		} else {  this.props.history.push('/login');     }
+	    }  );
+
+
+    };
+
+
+  render() {
+    return (
+
+      <div className="App">
+        <Route       path="/login" component={LoginContainer} /> 
+
+        <Route exact path="/main"  render={() => (<MainContainer propuser={this.state.user} /> )} />
+
+      </div>
+    );
+  }
+}
+
+export default withRouter(App);
+//export default App;

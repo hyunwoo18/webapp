@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+{% load bootstrap3 %}
+<html ng-app="myShoppingList">
+<head>
+{% load static %}
+<title>The ReDeG</title>
+
+<script src="{% static 'watsonstt/angular.min.js' %}"></script>
+<script src="{% static 'watsonstt/angular-cookies.js' %}"></script>
+<script src="{% static 'watsonstt/angular-route.js' %}"></script>
+<base href="/watson/multiword/">
+</head>
+
+<body ng-controller="myCtrl" >
+
+<div class="w3-card-2 w3-margin" style="max-width:1000px;">
+  <header class="w3-container w3-light-grey w3-padding-16">
+    <h3>You can create (1) a new word, (2) its display_as and (3) array of sounds_like:</h3>
+  </header>
+
+<p> Initial Cred {$ creddata $} </p> <button id="credboxbutton" class="w3-btn w3-padding w3-green">For new cred, click</button>
+<div style="display:none" id="credbox">
+<input placeholder="New Username" ng-model="newUsername" class="w3-input w3-border w3-padding">
+<input placeholder="New Password" ng-model="newPassword" class="w3-input w3-border w3-padding">
+<button ng-click="sendNewCred()" class="w3-btn w3-padding w3-green">Send a new cred</button><br>
+</div>
+<hr>
+
+<p> Initial Customization {$ custdata $} </p> <button id="custboxbutton" class="w3-btn w3-padding w3-green">For new cust, click</button>
+<div style="display:none" id="custbox">
+<input placeholder="Name"  ng-model="newName"  class="w3-input w3-border w3-padding">
+<input placeholder="Modl"  ng-model="newModl"  class="w3-input w3-border w3-padding">
+<input placeholder="Desc"  ng-model="newDesc"  class="w3-input w3-border w3-padding">
+<button ng-click="sendNewCust()" class="w3-btn w3-padding w3-green">Send a new cust</button><br>
+</div>
+
+
+<hr>
+
+<div>
+    New word:       <input type="text" ng-model="theword"><br>
+    its display_as: <input type="text" ng-model="thedisp"><br>
+</div>
+
+<br>
+
+  <ul class="w3-ul">
+    <li ng-repeat="x in products" class="w3-padding-16">{$ x $}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+  </ul>
+
+  <div class="w3-container w3-light-grey w3-padding-16">
+    <div class="w3-row w3-margin-top">
+      <div class="w3-col s10">
+        <input placeholder="Enter a new sounds_like" ng-model="addMe" class="w3-input w3-border w3-padding">
+      </div>
+      <div class="w3-col s2">
+        <button ng-click="addItem()" class="w3-btn w3-padding w3-green">Add a new sound_like</button><br>
+      </div>
+    </div>
+  </div>
+<br>
+
+
+<button id="appendbtn" ng-click="append()"      class="w3-btn w3-padding w3-green">Append a new word</button>
+
+<hr>
+<!--
+<p> {{ message }}  </p>
+-->
+<p> curl -u {$ creddata.username $}:{$ creddata.password $} -X POST --header "Content-type:application/json"   </p>
+<p> --data {$ hkobject2 $} </p>
+<p> https://stream.watsonplatform.net/speech-to-text/api/v1/customizations/{$ custdata.customid $}/words/ </p>
+
+
+<br>
+<button id="fetchbtn"  ng-click="send2django()" class="w3-btn w3-padding w3-green">Send to Django</button>
+
+<p> The status = {$ status $} </p>
+</div>
+
+<br>
+<hr>
+<a href="{% url 'watson:step9home' %}"> List all step9 words and their soundslikes </a>
+
+<br>
+<hr>
+<a href="{% url 'watson:step1list' %}"> If you want the original page for setting credential </a>
+
+<br>
+<hr>
+<a href="{% url 'watson:step2list' %}"> If you want the original page for setting customid </a>
+
+<br>
+<hr>
+
+
+<!-- ###################################################### -->
+<!-- ###################################################### -->
+<!-- ###################################################### -->
+<script type="text/javascript">
+
+  var credButton = document.getElementById("credboxbutton")
+  credButton.addEventListener("click", showCred, false);
+  function showCred() {
+     var credForm = document.getElementById("credbox")
+     credForm.style.display = 'block';
+  };
+
+  var custButton = document.getElementById("custboxbutton")
+  custButton.addEventListener("click", showCust, false);
+  function showCust() {
+     var custForm = document.getElementById("custbox")
+     custForm.style.display = 'block';
+  };
+
+
+//angular.element(document).ready( function() { });
+
+var app = angular.module("myShoppingList", ["ngCookies", "ngRoute"]);
+
+
+app.config( function($httpProvider, $interpolateProvider, $routeProvider, $locationProvider) {
+
+  $locationProvider.html5Mode(true);
+
+  $routeProvider.when("/list", {
+      templateUrl: "/static/watsonstt/tableView3.html"
+  });
+
+  $interpolateProvider.startSymbol('{$');
+  $interpolateProvider.endSymbol('$}');
+  $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+  }); 
+
+
+
+app.config( [ '$httpProvider', '$interpolateProvider', function($httpProvider, $interpolateProvider) {
+        $interpolateProvider.startSymbol('{$');
+        $interpolateProvider.endSymbol('$}');
+        $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    }]); 
+
+
+app.run(['$http', '$cookies', function($http, $cookies) {
+  $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+}]);
+
+app.controller("myCtrl", ['$scope', '$http', function($scope, $http) {
+
+
+    $scope.testroute = function() {
+       $location.path("/list");
+    }
+
+    $scope.sendNewCred = function() {
+      $scope.code     = null;
+      $scope.response = null;
+
+//      var fd  = new FormData();
+//      fd.append('username', $scope.newUsername);
+//      fd.append('password', $scope.newPassword);
+// I am getting, ValueError: No JSON object could be decoded, on the django side
+
+      var req = {
+         method: 'POST',
+         url: 'http://127.0.0.1:8000/watson/angularcred/',
+         headers: {
+            'Content-Type': undefined
+         },
+//       data: fd
+         data: {'username':$scope.newUsername, 'password': $scope.newPassword }
+       }
+
+      $http(req).
+        then(function(response) {
+          $scope.status    = response.status;
+          $scope.creddata  = response.data;
+        }, function(response) {
+          $scope.data = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+
+//////////////////////////////////////////////////////
+    $scope.sendNewCust = function() {
+      $scope.code     = null;
+      $scope.response = null;
+
+      var req = {
+         method: 'POST',
+         url: 'http://127.0.0.1:8000/watson/angularcust/',
+         headers: {
+            'Content-Type': undefined
+         },
+         data: {'name':$scope.newName, 'model': $scope.newModl, 'description': $scope.newDesc }
+       }
+
+      $http(req).
+        then(function(response) {
+          $scope.status    = response.status;
+          $scope.custdata  = response.data;
+        }, function(response) {
+          $scope.data = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+
+
+
+
+
+
+
+
+
+
+
+    var hkinitcred = function() {
+      $scope.code     = null;
+      $scope.response = null;
+      var req = {
+         method: 'GET',
+         url: 'http://127.0.0.1:8000/watson/getcred/',
+         headers: {
+            'Content-Type': undefined
+         },
+       }
+      $http(req).
+        then(function(response) {
+          $scope.status   = response.status;
+          $scope.creddata     = response.data;
+        }, function(response) {
+          $scope.data   = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+    hkinitcred();
+
+
+    var hkinitcust = function() {
+      $scope.code     = null;
+      $scope.response = null;
+      var req = {
+         method: 'GET',
+         url: 'http://127.0.0.1:8000/watson/getcust/',
+         headers: {
+            'Content-Type': undefined
+         },
+       }
+      $http(req).
+        then(function(response) {
+          $scope.status   = response.status;
+          $scope.custdata  = response.data;
+        }, function(response) {
+          $scope.data   = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+    hkinitcust();
+
+
+
+    $scope.hkarray2  = [];
+    $scope.hkobject2 = {words: $scope.hkarray2 };
+
+    $scope.products = [];
+    $scope.addItem = function () {
+        $scope.products.push($scope.addMe);
+    };
+    $scope.removeItem = function (x) {
+        $scope.products.splice(x, 1);
+    };
+
+
+    $scope.append = function() {
+      var hkobject3 = {};
+      hkobject3["word"] = $scope.theword;
+      hkobject3["display_as"] = $scope.thedisp;
+      hkobject3["soundslikearray"] = $scope.products;
+
+      $scope.hkarray2.push( hkobject3 );
+// reset
+      $scope.products = [];
+
+    };
+// end of append
+
+    $scope.send2django = function() {
+      $scope.code     = null;
+      $scope.response = null;
+
+//      var hkobject1 = {};
+//      hkobject1["Word"] = $scope.theword
+//      hkobject1["Disp"] = $scope.thedisp
+//      hkobject1["soundslikearray"] = $scope.products
+
+      var req = {
+         method: 'POST',
+         url: 'http://127.0.0.1:8000/watson/multiwordsave/',
+         headers: {
+            'Content-Type': undefined
+         },
+         data: $scope.hkobject2
+       }
+
+      $http(req).
+        then(function(response) {
+          $scope.hkobject2 = {};
+          $scope.status = response.status;
+          $scope.data   = response.data;
+        }, function(response) {
+          $scope.hkobject2 = {};
+          $scope.data = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+// end of fetch
+
+}]);
+</script>
+
+
+</body>
+</html>

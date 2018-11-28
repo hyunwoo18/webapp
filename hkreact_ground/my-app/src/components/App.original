@@ -1,0 +1,49 @@
+import React, { Component } from 'react';
+import { Route, withRouter } from 'react-router-dom';
+import LoginContainer from './LoginContainer';
+import MainContainer from './MainContainer';
+import FreqContainer from './FreqContainer';
+
+import StyledContainer from './StyledContainer';
+//import Header from './Header';
+//import logo from './images/logo.svg';
+//import './App.css';
+//import fire from './fire';
+
+import * as firebase from 'firebase';
+import 'firebase/auth';
+
+class App extends Component {
+    constructor() {	super();	this.state = {	    user: null	}    }
+    componentDidMount() {
+        //firebase.auth().setPersistence( 'local' ).then( function() { console.log("persistence success"); } );
+        firebase.auth().onAuthStateChanged(  user => {
+                if (user) {
+                    console.log( user.email )
+                    this.setState(  { user }  );
+                } else {  this.props.history.push('/login');     }
+            }  );
+    }
+
+    handleLogout = () => {
+        firebase.auth().signOut();
+	// without this, the this.props.fuser in MainContainer retains the previous user
+	this.setState( {user:null} );
+    };
+
+    render() {
+	//<div style={{backgroundColor: "aqua", height: "100%" }}>
+	return ( <div>
+		 <Route       path="/login" component={LoginContainer} /> 
+
+	    {this.state.user && <Route exact path="/"        render={ () => ( <StyledContainer fuser={this.state.user} />) }  />  }
+
+	    {this.state.user && <Route exact path="/resume"        render={ () => ( <MainContainer 
+									      hLogout={this.handleLogout}
+									      fuser={this.state.user} />) }   />  }
+	    {this.state.user && <Route       path="/connect" render={ () => ( <FreqContainer fuser={this.state.user} />) }   />  }
+		</div> );
+    }
+}
+
+export default withRouter(App);

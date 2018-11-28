@@ -1,0 +1,18 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+
+<h3> Make sure the following is the current customization that you are using</h3>
+
+<ul>
+{% for custid in custidlist %}
+     <li>{{ custid.custID }}  </li>
+{% endfor %}
+</ul>
+
+<h1> <a href="{% url 'watson:step2form' %}"> If you need a new customization ID, click this</a> </h1>
+{% endblock %}
+
+<hr>
+
+<hr>

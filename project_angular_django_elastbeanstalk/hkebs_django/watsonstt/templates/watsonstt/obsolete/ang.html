@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+{% load bootstrap3 %}
+
+<html lang="en">
+<head>
+  <title>The ReDeG</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-cookies.js"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+
+</head>
+
+<body>
+{% load staticfiles %}
+<!--
+<div ng-app="myShoppingList" ng-controller="myCtrl">
+  <ul>
+    <li ng-repeat="x in products">{$ x $}  <span ng-click="removeItem($index)">&times;</span>   </li>
+  </ul>
+
+  <input ng-model="addMe">
+  <button ng-click="addItem()">Add</button>
+</div>
+-->
+<p>Write in the input field to add items.</p>
+
+<div ng-app="myShoppingList" ng-cloak ng-controller="myCtrl" class="w3-card-2 w3-margin" style="max-width:400px;">
+  <header class="w3-container w3-light-grey w3-padding-16">
+    <h3>My Shopping List</h3>
+  </header>
+
+  <div>
+    Word: <input type="text" ng-model="theword"><br>
+    Disp: <input type="text" ng-model="thedisp"><br>
+  </div>
+<!--
+    Full  Name: {$ theword + " " + thedisp $}
+-->
+
+<br>
+<hr>
+
+  <ul class="w3-ul">
+    <li ng-repeat="x in products" class="w3-padding-16">{$ x $}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+  </ul>
+
+  <div class="w3-container w3-light-grey w3-padding-16">
+    <div class="w3-row w3-margin-top">
+      <div class="w3-col s10">
+        <input placeholder="Add shopping items here" ng-model="addMe" class="w3-input w3-border w3-padding">
+      </div>
+      <div class="w3-col s2">
+        <button ng-click="addItem()" class="w3-btn w3-padding w3-green">Add</button><br>
+      </div>
+    </div>
+  </div>
+<br>
+	<button id="fetchbtn" ng-click="fetch()" class="w3-btn w3-padding w3-green">fetch</button>
+</div>
+
+
+<script type="text/javascript">
+var app = angular.module("myShoppingList", ['ngCookies']);
+app.config( [ '$httpProvider', '$interpolateProvider', function($httpProvider, $interpolateProvider) {
+        $interpolateProvider.startSymbol('{$');
+        $interpolateProvider.endSymbol('$}');
+        $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    }]); 
+
+app.run(['$http', '$cookies', function($http, $cookies) {
+  $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+}]);
+
+app.controller("myCtrl", ['$scope', '$http', function($scope, $http) {
+
+    $scope.theword = "HKWord";
+    $scope.thedisp = "HKDisp";
+
+    $scope.method = 'POST';
+    $scope.url = 'http://127.0.0.1:8000/watson/dynamictest/';
+
+    $scope.products = ["Milk", "Bread"];
+    $scope.addItem = function () {
+        $scope.products.push($scope.addMe);
+    };
+    $scope.removeItem = function (x) {
+        $scope.products.splice(x, 1);
+    };
+
+    $scope.fetch = function() {
+      $scope.code = null;
+      $scope.response = null;
+
+//      var hkobject1 = { "word": "IEEE", "display_as": "ieee", soundarray: ["AA","BB","CC","DD"] }
+      var hkobject1 = {};
+      hkobject1["Word"] = "TAXI"
+      hkobject1["Disp"] = "taxi"
+      hkobject1["soundslikearray"] = ["TTT","AAA","XXX","III"]
+
+//      for ( var i = 0; i < $scope.products.length; i++ ) {
+//         hkobject1[ i ] = $scope.products[i];
+//      }
+//      hkobject1["TheWord"] = $scope.theword
+//      hkobject1["TheDisp"] = $scope.thedisp
+
+      var req = {
+         method: 'POST',
+         url: 'http://127.0.0.1:8000/watson/dynamictest/',
+         headers: {
+            'Content-Type': undefined
+         },
+         data: hkobject1
+       }
+
+      $http(req).
+        then(function(response) {
+          $scope.status = response.status;
+          $scope.data = response.data;
+        }, function(response) {
+          $scope.data = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+
+}]);
+
+
+</script>
+
+
+</body>
+</html>

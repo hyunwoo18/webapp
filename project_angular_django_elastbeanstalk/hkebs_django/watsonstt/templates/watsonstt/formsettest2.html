@@ -1,0 +1,15 @@
+<h1> form set test </h1>
+
+<form action="/watson/formsettest/" method="post">
+    {% csrf_token %}
+
+    {{ form }}
+    <hr>
+
+    <table>
+        {{ formset }}
+    </table>
+
+    <input type="submit" value="Submit" />
+</form>
+

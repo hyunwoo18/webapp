@@ -1,0 +1,110 @@
+import React, { Component } from 'react';
+import { Route, Redirect, withRouter, Link } from 'react-router-dom';
+import styled from 'styled-components';
+
+import { createStore, combineReducers } from 'redux';
+import { Provider, connect }            from 'react-redux';
+import uuid from 'uuid';
+
+import StyledContainer from './StyledContainer';
+import StyledtestContainer from './StyledtestContainer';
+
+const Appheader  = styled.div`  background-color: hotpink; text-align: center;`;
+const Apptopnav  = styled.div` overflow: hidden;    background-color: #333;`;
+const Apptopnava = styled.a`
+    float: left;
+color: #f2f2f2;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-size: 17px;
+
+&:hover {
+    background-color: #ddd;
+    color: black;
+  }
+`;
+const Apptopnavaright  = Apptopnava.extend`float: right;`;
+
+const AppHeaderSection = (props) => (
+<Appheader>
+
+<Apptopnav>  
+
+<Apptopnava>      <Link to='/'>      First Page </Link> </Apptopnava>  
+<Apptopnavaright> <Link to='/test'> Second Page </Link> </Apptopnavaright>  
+
+</Apptopnav>
+
+</Appheader>
+ );
+
+//// begin reducer
+
+const reducer = combineReducers( { activeThreadId: activeThreadIdReducer, threads: threadsReducer, } );
+
+// take current state and an action AND return a new state
+function activeThreadIdReducer(state = '1-fca2', action) {
+    if ( action.type === 'OPEN_THREAD' ) { return action.id; } 
+    else                                 { return state;  }
+}
+// take current state and an action AND return a new state
+function threadsReducer(state = [
+ {  id: '1-fca2',    title: 'Buzz Aldrin',      messages: messagesReducer(undefined, {}), },
+ {  id: '2-be91',    title: 'Michael Collins',  messages: messagesReducer(undefined, {}), },
+				 ], action) {
+    switch (action.type) {
+    case    'ADD_MESSAGE':
+    case 'DELETE_MESSAGE': {
+      const threadIndex = findThreadIndex(state, action);
+      const oldThread = state[threadIndex];
+      const newThread = {	    ...oldThread,	    messages: messagesReducer(oldThread.messages, action), };
+      return [
+	      ...state.slice(0, threadIndex),
+	      newThread,
+	      ...state.slice( threadIndex + 1, state.length ),
+	      ];
+    }
+
+    default: { return state; }
+    } // end switch
+}
+
+function findThreadIndex(threads, action) {
+    switch (action.type) {
+      case    'ADD_MESSAGE': { return threads.findIndex( (t) => t.id === action.threadId );      }
+      case 'DELETE_MESSAGE': { return threads.findIndex( (t) => t.messages.find((m) => ( m.id === action.id )) ); }
+    }
+}
+
+function messagesReducer(state = [], action) {
+    switch (action.type) {
+
+      case 'ADD_MESSAGE': {
+	const newMessage = { text: action.text, timestamp: Date.now(), id: uuid.v4(), };
+	return state.concat( newMessage );
+      }
+      case 'DELETE_MESSAGE': { return state.filter( m => m.id !== action.id );     }
+      default:               { return state; }
+
+    } // end switch
+}
+
+//// end reducer //////////////////////////////
+
+const store = createStore(reducer);
+
+class App extends Component {
+    render() {
+	return ( 
+		<div>
+		 <AppHeaderSection />
+		 <Route    exact   path="/" component={StyledContainer} /> 
+		 <Route    path="/test"     component={StyledtestContainer} /> 
+		</div> );
+    }
+}
+
+const WrappedApp = () => ( <Provider store={store}>    <App />  </Provider>  );
+
+export default withRouter(WrappedApp);

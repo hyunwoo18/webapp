@@ -1,0 +1,72 @@
+<style>
+.boxed {
+  border: 1px solid green ;
+}
+</style>
+
+<!--  -->
+<div class="panel panel-danger">
+
+<div class="panel-heading">
+<h3 class="panel-title">Panel title</h3>
+</div>
+
+  <div class="panel-body">
+
+<!--
+<div class="boxed">
+-->
+curl -u {$ creddata.username $}:{$ creddata.password $} -X POST --header "Content-type:application/json" 
+ --data {$ hkobject2 $} 
+https://stream.watsonplatform.net/speech-to-text/api/v1/customizations/{$ custdata.customid $}/words/
+
+</div>
+</div>
+
+
+<hr>
+  <header class="w3-container w3-light-grey w3-padding-16">
+    <h3>You can create (1) a new word, (2) its display_as and (3) array of sounds_like:</h3>
+  </header>
+
+<div>
+    New word:       <input type="text" ng-model="theword"><br>
+    its display_as: <input type="text" ng-model="thedisp"><br>
+</div>
+
+<br>
+
+  <ul class="w3-ul">
+    <li ng-repeat="x in products" class="w3-padding-16">{$ x $}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+  </ul>
+
+  <div class="w3-container w3-light-grey w3-padding-16">
+    <div class="w3-row w3-margin-top">
+      <div class="w3-col s10">
+        <input placeholder="Enter a new sounds_like" ng-model="addMe" class="w3-input w3-border w3-padding">
+      </div>
+      <div class="w3-col s2">
+        <button ng-click="addItem()" class="btn btn-warning">Add a new sound_like</button><br>
+      </div>
+    </div>
+  </div>
+
+<br>
+
+<button id="appendbtn" ng-click="append()" class="btn btn-primary">Append a new word</button>
+<button id="appendbtn" ng-click="pop()" class="btn btn-danger">Remove the latest word</button>
+
+<hr>
+
+<br>
+<button id="fetchbtn"  ng-click="send2django()" class="w3-btn w3-padding w3-green">Send to Django</button>
+
+<!--
+<p> The status = {$ status $} </p>
+<br>
+<a href="{% url 'watson:step9home' %}"> List all step9 words and their soundslikes </a>
+<br>
+<a href="{% url 'watson:step1list' %}"> If you want the original page for setting credential </a>
+<br>
+<a href="{% url 'watson:step2list' %}"> If you want the original page for setting customid </a>
+-->

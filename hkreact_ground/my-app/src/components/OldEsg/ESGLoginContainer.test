@@ -1,0 +1,24 @@
+import React, { Component } from 'react';
+import { Route, Redirect, withRouter, Link } from 'react-router-dom';
+import styled from 'styled-components';
+import {Header} from './ESGMainContainer';
+
+import hat from './header-bg.jpg';
+
+//const Hero=styled.div` color:white; width:100%; position:relative; background-size:cover; min-height:800px; background-image:url(${hat});`;
+const Hero=styled.div`                       width:100%;     position:relative; background-size:cover; min-height:800px;  background-image:url(${hat});`;
+
+
+class ESGLoginContainer extends Component {
+
+    render() { 	return (
+<Hero>
+</Hero>
+
+     );
+    }
+}
+
+
+
+export default ESGLoginContainer;

@@ -1,0 +1,65 @@
+.nav-bordered > li {
+  float: left;
+}
+.nav-bordered > li > a {
+  display: inline-block;
+  padding: 10px 0;
+  font-weight: 300;
+  color: #777;
+  border-bottom: 4px solid transparent;
+}
+.nav-bordered > li > a:hover,
+.nav-bordered > li > a:focus {
+  color: #1CA8DD;
+  background-color: transparent;
+}
+.nav-bordered > li + li {
+  margin-left: 30px;
+}
+.nav-bordered > li.active > a,
+.nav-bordered > li.active > a:hover,
+.nav-bordered > li.active > a:focus {
+  font-weight: 500;
+  color: #777;
+  border-bottom-color: #1CA8DD;
+}
+.nav-bordered.nav-justified > li + li {
+  margin-left: 0;
+}
+.nav-bordered.nav-justified > li > a {
+  margin-bottom: 0;
+}
+.nav-bordered.nav-stacked > li {
+  float: none;
+  margin-left: 0;
+}
+.nav-bordered.nav-stacked > li + li {
+  margin-top: 0;
+}
+.nav-bordered.nav-stacked > li.active > a,
+.nav-bordered.nav-stacked > li.active > a:hover,
+.nav-bordered.nav-stacked > li.active > a:focus {
+  border-left-color: #1CA8DD;
+}
+.nav-bordered.nav-stacked > li > a {
+  display: block;
+  padding: 5px 10px 5px 30px;
+  border-bottom: 0;
+  border-left: 4px solid transparent;
+}
+.nav-bordered.nav-stacked > li > a:hover,
+.nav-bordered.nav-stacked > li > a:focus {
+  border-left: 4px solid;
+}
+.nav-bordered.nav-stacked .nav-header {
+  padding-left: 34px;
+}
+.nav-bordered.nav-stacked .nav-divider {
+  height: 1px;
+  margin: 9.5px 0;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin-left: 34px;
+  margin-top: 20px;
+  margin-bottom: 25px;
+}

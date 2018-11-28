@@ -1,0 +1,343 @@
+import React, { Component } from 'react';
+//import * as firebase from 'firebase';
+import styled from 'styled-components';
+//import ruiz from './ruiz.jpg';
+
+import { Route, Link } from 'react-router-dom';
+
+import ModalContainer from './ModalContainer';
+
+// not used
+const Title = styled.h1`    font-size: 1.5em;    text-align: center;    color: palevioletred;`;
+// not used
+const Wrapper = styled.section`    padding: 4em;    background: papayawhip;`;
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//    width: 100%;
+//const Hpage = styled.div` position: absolute;top: 0; bottom: 0; right: 0; left: 0;`;
+const Hpage = styled.div` position: absolute; top: 60px; bottom: 0; right: 0; left: 0;`;
+const Entirepage = (props) => ( <Hpage> {props.children} </Hpage>  );
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+// position: sticky; not working
+// padding: 20px;
+const Hheader = styled.div`  background-color: #F1F1F1; text-align: center;`;
+const Htopnav = styled.div` overflow: hidden;    background-color: #333;`;
+const Htopnava  = styled.a`
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    &:hover {    background-color: #ddd;    color: black; }
+`;
+const Htopnavaright  = Htopnava.extend`float: right;`;
+const Hul  = styled.ul`    list-style-type: none;    margin: 0;    padding: 0;overflow: hidden;background-color: #333;`;
+const Hlia = styled.li`
+    float: left;
+    a {
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	&:hover {	    background-color: #ddd;	    color: black;	}
+    }
+`;
+const Hliaright  = Hlia.extend`    float: right; `;
+
+const HeaderSection = (props) => (
+<Hheader>
+
+<Htopnav>  <Htopnava>      link1 </Htopnava>  <Htopnavaright> link3 </Htopnavaright>  </Htopnav>
+<br />
+<Hul> <Hlia>      <a> Link1 </a> </Hlia> <Hliaright> <a> About </a> </Hliaright> </Hul>
+
+</Hheader>
+);
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+const Hcontainer = styled.div` display: flex; height: 100%; width: 100%; background: papayawhip;`;
+const MainSection = (props) => (
+		<Hcontainer>
+<LeftBarSection />
+<CenterSection />
+<RiteBarSection />
+		</Hcontainer> );
+///////////////////////////////////////////////////////
+const Hside   = styled.div` flex-grow: 1; height: 100%; background-color: yellow;  text-align: center;`;
+const Hcenter = styled.div` flex-grow: 5; height: 100%; background-color: hotpink; text-align: center;`;
+//      <Hform /> 
+const LeftBarSection=(props)=>(<Hside> <Link to='/temp/main1'>Main1</Link> <br /> <Link to='/temp/main2'>Main2</Link> <br /> </Hside> );
+const RiteBarSection=(props) => ( <Hside>   <h3> Right  </h3>  </Hside>   );
+//   <div style={{margin:'auto'}}>
+const CenterSection  = (props) => ( 
+   <Hcenter>  <h3> Center </h3>  
+   <Route    path="/temp/main1"  component={ModalContainer} />
+   <Route    path="/temp/main2"  component={Checkout} />
+  </Hcenter> 
+);
+
+///////////// new resume start
+const StyledCheckout=styled.div`margin:auto; background: white; width: 50%; `;
+
+const Checkout = (props) => (
+      <StyledCheckout>
+      <PaymentForm onSubmit={props.paySubmit} />
+      </StyledCheckout> );
+///////// PaymentForm materials 
+/// part 1
+const Ritle=styled.div` font-family: 'Playfair Display';font-size: 18px;padding: 20px; `;
+/// part 2
+const BasicInput = (props) => (
+<BasicInputStyled>
+<label htmlFor={props.name}>  {props.label}  </label>
+<input id={props.name} type={props.type} placeholder={props.placeholder} />
+</BasicInputStyled>     );
+const BasicTarea = (props) => (
+<BasicInputStyled>
+<label htmlFor={props.name}>  {props.label}  </label>
+<textarea id={props.name} rows="4" />
+</BasicInputStyled>     );
+const BasicInputStyled = styled.div`    padding: 0 20px;  margin-bottom: 20px;
+label {
+    display: block;    text-transform: uppercase;    margin-bottom: 5px;
+    font-size: 11px;    font-weight: 600;
+}
+input {
+    width: 100%;    border: 0;    border-bottom: 1px solid #17183B;    font-family: 'Lato', sans-serif;    padding: 5px 0;
+    font-size: 18px;    font-weight: 300;    outline: none;
+    &:focus { border-bottom: 1px solid #FFB49A; }
+}
+textarea {
+    width: 100%;    border: 0;    border-bottom: 1px solid #17183B;    font-family: 'Lato', sans-serif;    padding: 5px 0;
+    font-size: 18px;    font-weight: 300;    outline: none;
+    &:focus { border-bottom: 1px solid #FFB49A; }
+}
+`;
+/// part PaymentForm
+const PaymentForm = (props) => (
+ <div className="PaymentForm">  <form>  <Ritle>Your resume information</Ritle>
+          <BasicInput name="name" label="Name on credit card" type="text"   placeholder="John Smith" />
+          <BasicInput name="company" label="Current Company"  type="text" placeholder="Apple" />
+          <BasicInput name="card" label="Credit card number"  type="number" placeholder="0000 0000 0000 0000" />
+          <BasicTarea name="resume" label="Description"  placeholder="0000 0000 0000 0000" />
+
+ <WorkExperience />
+
+          <CheckoutButton />
+ </form> </div> );
+
+const BaseInput = (props) => (
+<BasicInputStyled>
+<label htmlFor={props.name}>  {props.label}  </label>
+<input id={props.name} type={props.type} ref={props.testref} placeholder={props.placeholder} />
+</BasicInputStyled>     );
+//<input name="period" type='text' ref={this.props.refPeriod} placeholder="period"    /> 
+//<input name="title"  type='text' ref={this.props.refTitle}  placeholder="Title"    /> 
+const JkInputStyled = styled.div`  border-style: solid;  border-color: red; `;
+class Jkinput extends Component {
+    render () {
+	    return (
+		    <JkInputStyled>
+          <BaseInput testref={this.props.refPeriod} name="period" label="Period" type="text" placeholder="John Smith" />
+          <BaseInput testref={this.props.refTitle} name="title"  label="Title"  type="text" placeholder="Apple" />
+		    </JkInputStyled>
+		    ) ;
+	}
+}
+class WorkExperience extends Component {
+    constructor(props) {
+        super(props);
+        this.jkinputs = [ {period: "1970", title: "engineer"}, {period: "2012", title: "midfiel"} ];
+    }
+    fuckClick = ( hkarray ) => {
+	hkarray.forEach( (i) => { 		console.log( i.periodRef.value ); 		console.log( i.titleRef.value );    } );
+    }
+    handleAdd = ( ) => {
+	let tempinput= {period: "dummy", title: "dummy"};
+	//console.log( this.jkinputs );
+	this.jkinputs.push( tempinput );
+	//console.log( this.jkinputs );
+	this.forceUpdate();
+    }
+	handleDel = ( id ) => {
+	    console.log( "before del" );
+	    console.log( id );
+	    console.log( this.jkinputs );
+
+	    this.jkinputs = this.jkinputs.splice( id, 1 );
+
+	    console.log( "after del" );
+	    console.log( this.jkinputs );
+	    this.forceUpdate();
+    }
+	//<Jkinput refPeriod={elem => this.jkinputs[id].periodRef=elem} refTitle={elem => this.jkinputs[id].titleRef=elem} /> 
+    render() {
+	console.log( "inside render" );
+	console.log( this.jkinputs );
+	const raul = this.jkinputs.map( (jkinput, id) => { 
+		console.log( jkinput );
+		console.log( id );
+
+		return ( 
+<div>
+<Jkinput refPeriod={elem => jkinput.periodRef=elem} refTitle={elem => jkinput.titleRef=elem} /> 
+<button type="button" onClick={ () => this.handleDel( id ) }> Delete </button>
+</div>
+			 ); } );
+	return (
+		<div>
+		<h1> Work Experience </h1> 
+		<h1 onClick={ () => this.handleAdd() }> Add another block </h1>
+		{raul}
+		<h1 onClick={ () => this.fuckClick( this.jkinputs ) }> click  </h1>
+		</div>
+		);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// part 3
+const CheckoutButton = (props) => (
+<CheckoutButtonStyled>  <button>Submit your resume</button>  <span>Your credit card information is encrypted</span> </CheckoutButtonStyled> );
+const CheckoutButtonStyled = styled.div`     padding: 0 20px; text-align: center;
+button {
+    background: #ffa181;    color: white;    border: 0;    border-radius: 2px;    font-family: 'Lato', sans-serif;
+    width: 100%;    font-size: 13px;    text-transform: uppercase;    font-weight: 300;    outline: none;    padding: 10px 0;
+    margin-bottom: 10px;
+    &:hover {	background: #ff8e67;    }
+    &:active {        -webkit-transform: scale(0.99);        transform: scale(0.99);    }
+}
+span { font-size: 11px; color: #bfbfbf;    font-weight: 300;    text-align: center;}
+`;
+///////////// End new resume s
+
+////////////////////////////////////////////////////////////
+class StyledContainer extends Component {
+    constructor(props) { super(props); }
+    render() {	return (  
+			<Entirepage>
+			<HeaderSection />
+			<MainSection />  
+			</Entirepage> );  }
+    //render() {	return (  <div>  <HeaderSection />  <MainSection />  </div> );  }
+}
+
+export default StyledContainer;
+
+class Hkinput extends Component {
+
+    handleChange = (event) => {
+	this.props.onChange( this.props.hkid, event.target.name, event.target.value );
+    }
+    
+    render () {
+	    return (
+		    <div>
+		    <input name="period" type='text' onChange={this.handleChange} value={this.props.hkinput.period} placeholder="period"    /> 
+		    <input name="title" type='text' onChange={this.handleChange} value={this.props.hkinput.title}  placeholder="Title"    /> 
+		    </div>
+		    ) ;
+	}
+}
+
+
+
+class WorkExperience0 extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { hkinputs: [ {period: "1970", title: "engineer"} ]  };
+    }
+    funcone = (id, key, value) => {
+	let newinput = this.state.hkinputs[id];
+	newinput.key = value;
+	let newinputs = [ ...this.state.hkinputs.slice(0, id), newinput, ...this.state.hkinputs.slice(id+1, this.state.hkinputs.length) ];
+	this.setState( {hkinputs: newinputs} );
+    }
+	componentDidMount() {
+	    console.log( "main 1" );
+	    console.log( this.state.hkinputs );
+	}
+    render() {
+	const raul = this.state.hkinputs.map( (hkinput, id) => { return ( <Hkinput hkid={id} hkinput={hkinput}  onChange={this.funcone} /> ); } );
+	return raul;
+    }
+}
+
+
+
+/////////////////////////////////////////////////////////////////
+class Hform extends Component {
+
+    state = {
+	fields: {
+	    name: '',
+	    email: ''
+	},
+    };
+
+
+    onFormSubmit = evt => {
+	console.log("on form submit");
+	evt.preventDefault();
+    };
+
+
+    onInputChange = evt => {
+	console.log("on Input Change");
+	//const fields = Object.assign({}, this.state.fields);
+	//fields[evt.target.name] = evt.target.value;
+	//this.setState({fields});
+    };
+
+    render() {
+	return (
+      <div>
+        <h1>Sign Up Sheet</h1>
+      {/*
+      <form onSubmit={this.onFormSubmit}>
+          <input
+            placeholder="Name"
+            name="name"
+      value={this.state.fields.name}
+      onChange={this.onInputChange}
+          />
+
+          <input
+            placeholder="Email"
+            name="email"
+      value={this.state.fields.email}
+      onChange={this.onInputChange}
+          />
+
+          <input type="submit" />
+        </form>
+       */}
+      </div>
+		);
+    }
+
+
+}
+
+

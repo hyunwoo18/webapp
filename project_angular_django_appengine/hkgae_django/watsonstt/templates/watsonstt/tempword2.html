@@ -1,0 +1,22 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+
+<h1> List a word and its soundslikes </h1>
+
+<ul>
+{% for word in wordlist %}
+     <li> {{ word.hkword }} -- {{ word.hkdisp }}   <a href="{% url 'watson:tempword3' word.id %}"> add more soundslike </a> <a href="{% url 'watson:tempword4' word.id %}"> delete a sound? </a>   <a href="{% url 'watson:tempword6' word.id %}"> delete the word? </a>  </li>
+<ul>
+    {% for sound in word.tempsound_set.all %}
+        <li>{{ sound.hksoundslike }} -- {{ sound.hkwordkey }}</li>
+    {% endfor %}
+</ul>
+
+{% endfor %}
+</ul>
+
+<br>
+<a href="{% url 'watson:singlewordrender' %}"> Show the final command </a>
+
+{% endblock %}

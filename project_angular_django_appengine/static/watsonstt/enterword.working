@@ -1,0 +1,101 @@
+<style>
+.boxed {
+  border: 1px solid green ;
+}
+</style>
+
+<hr>
+<div class="well" ng-repeat="item in fuckdata">
+<a ng-click = "fuckyou(item)">
+            <h3>
+                <span class="pull-left label label-primary">                    {$ item.word $}                </span>
+                <strong>{$ item.disp $}</strong>
+                <strong>ID = {$ item.hkid $}</strong>
+                <strong>selected = {$ item.selected $}</strong>
+		<span class="lead">{$ item.sond $}</span>
+		<a ng-click = "deleteyou(item)"> Delete this word? </a>
+            </h3>
+</a>
+</div>
+
+<!--
+<div ng-if = "itemselected">
+-->
+<form name="wordForm2" novalidate>
+       <div class="form-group">
+            <label> Word to modify </label>
+            <input placeholder="{$ modname $}" name="name2" class="form-control" ng-model="theword2" required />
+       </div>
+        <div class="form-group">
+            <label>Display_as to modify</label>
+            <input placeholder="{$ moddisp $}" name="street2" class="form-control"  ng-model="thedisp2" required />
+        </div>
+        <div class="form-group">
+            <label>Sound_like</label>
+            <input name="sound2" class="form-control"  ng-model="hkt" required /> <button ng-click="addTemp()" class="btn btn-warning">Add a new sound_like</button>
+        </div>
+
+  <ul class="w3-ul">
+    <li ng-repeat="x in sounds">{$ x $} <span ng-click="removeItemTemp(item, $index)" style="cursor:pointer;" class="w3-right w3-margin-right">Delete?</span></li>
+  </ul>
+
+<button id="fetchbtn2"  ng-click="send2modify()" class="btn btn-primary">Send to Modify</button>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+  <header class="w3-container w3-light-grey w3-padding-16">
+    <h3>Enter a word</h3>
+  </header>
+
+<form name="wordForm" novalidate>
+ <div class="well">
+
+       <div class="form-group">
+            <label> New Word </label>
+            <input name="name" class="form-control" ng-model="theword" required />
+       </div>
+
+        <div class="form-group">
+            <label>Display_as</label>
+            <input name="street" class="form-control"  ng-model="thedisp" required />
+        </div>
+
+        <div class="form-group">
+            <label>Sound_like</label>
+            <input placeholder="Enter a new sounds_like" name="sound" class="form-control"  ng-model="addMe"/> <button ng-click="addItem()" class="btn btn-warning">Add a new sound_like</button>
+        </div>
+
+
+</div>
+</form>
+
+<hr>
+
+
+<p>
+word you typed in is {$ theword $} <br>
+its display_as is {$ thedisp $} <br>
+its sound_like are
+  <ul class="w3-ul">
+    <li ng-repeat="x in products" class="w3-padding-16">{$ x $}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">Delete?</span></li>
+  </ul>
+</p>
+
+
+<button id="fetchbtn"  ng-click="send2django()" class="btn btn-primary">Send to Django</button>
+
+<!--
+<button id="appendbtn" ng-click="append()" class="btn btn-primary">Append a new word</button>
+<button id="appendbtn" ng-click="pop()" class="btn btn-danger">Remove the latest word</button>
+
+-->

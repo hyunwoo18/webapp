@@ -1,0 +1,13 @@
+.nav > .nav-header {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 5px;
+  font-size: 85%;
+  font-weight: normal;
+  letter-spacing: 1px;
+  color: #aeaeae;
+  text-transform: uppercase;
+}
+.nav > li + .nav-header {
+  margin-top: 20px;
+}

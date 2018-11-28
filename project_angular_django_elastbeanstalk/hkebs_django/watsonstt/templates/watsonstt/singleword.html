@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+{% load bootstrap3 %}
+
+<html lang="en">
+<head>
+  <title>The ReDeG</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-cookies.js"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+
+</head>
+
+<body>
+{% load staticfiles %}
+<p>Write in the input field to add items.</p>
+
+<div ng-app="myShoppingList" ng-cloak ng-controller="myCtrl" class="w3-card-2 w3-margin" style="max-width:400px;">
+  <header class="w3-container w3-light-grey w3-padding-16">
+    <h3>Add a single word and its display_as and list of sounds_like</h3>
+  </header>
+
+  <div>
+    New word: <input type="text" ng-model="theword"><br>
+    its display_as: <input type="text" ng-model="thedisp"><br>
+  </div>
+
+<br>
+<hr>
+
+  <ul class="w3-ul">
+    <li ng-repeat="x in products" class="w3-padding-16">{$ x $}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+  </ul>
+
+  <div class="w3-container w3-light-grey w3-padding-16">
+    <div class="w3-row w3-margin-top">
+      <div class="w3-col s10">
+        <input placeholder="Add a new sounds_like here and click the Add button" ng-model="addMe" class="w3-input w3-border w3-padding">
+      </div>
+      <div class="w3-col s2">
+        <button ng-click="addItem()" class="w3-btn w3-padding w3-green">Add</button><br>
+      </div>
+    </div>
+  </div>
+<br>
+	<button id="fetchbtn" ng-click="fetch()" class="w3-btn w3-padding w3-green">fetchall</button>
+</div>
+
+<br>
+<a href="{% url 'watson:singlewordrender' %}"> Show the final command, </a>
+<a href="{% url 'watson:start' %}"> Home </a>
+
+
+<script type="text/javascript">
+var app = angular.module("myShoppingList", ['ngCookies']);
+app.config( [ '$httpProvider', '$interpolateProvider', function($httpProvider, $interpolateProvider) {
+        $interpolateProvider.startSymbol('{$');
+        $interpolateProvider.endSymbol('$}');
+        $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    }]); 
+
+app.run(['$http', '$cookies', function($http, $cookies) {
+  $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+}]);
+
+app.controller("myCtrl", ['$scope', '$http', function($scope, $http) {
+
+    $scope.theword = "HKWord";
+    $scope.thedisp = "HKDisp";
+
+    $scope.method = 'POST';
+    $scope.url = 'http://127.0.0.1:8000/watson/dynamictest/';
+
+    $scope.products = [];
+    $scope.addItem = function () {
+        $scope.products.push($scope.addMe);
+    };
+    $scope.removeItem = function (x) {
+        $scope.products.splice(x, 1);
+    };
+
+    $scope.fetch = function() {
+      $scope.code = null;
+      $scope.response = null;
+
+//      var hkobject1 = { "word": "IEEE", "display_as": "ieee", soundarray: ["AA","BB","CC","DD"] }
+      var hkobject1 = {};
+      hkobject1["Word"] = $scope.theword
+      hkobject1["Disp"] = $scope.thedisp
+      hkobject1["soundslikearray"] = $scope.products
+
+//      for ( var i = 0; i < $scope.products.length; i++ ) {
+//         hkobject1[ i ] = $scope.products[i];
+//      }
+//      hkobject1["TheWord"] = $scope.theword
+//      hkobject1["TheDisp"] = $scope.thedisp
+
+      var req = {
+         method: 'POST',
+         url: 'http://127.0.0.1:8000/watson/singlewordsave/',
+         headers: {
+            'Content-Type': undefined
+         },
+         data: hkobject1
+       }
+
+      $http(req).
+        then(function(response) {
+          $scope.status = response.status;
+          $scope.data = response.data;
+        }, function(response) {
+          $scope.data = response.data || 'Request failed';
+          $scope.status = response.status;
+      });
+    };
+
+}]);
+
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+
+<ul>
+
+<li> <a href="{% url 'watson:xhour1' %}"> XHR 1 </a></li>
+<hr>
+
+<li> <a href="{% url 'watson:filetest1' %}"> File Test </a></li>
+<hr>
+
+
+<li> <a href="{% url 'watson:step1list' %}"> Check the current credential </a></li>
+<hr>
+
+<!--
+<li> <a href="{% url 'watson:step1form' %}"> step1 </a></li>
+<hr>
+-->
+
+<li> <a href="{% url 'watson:step2list' %}"> Check the current custimization ID </a></li>
+<hr>
+
+<li> <a href="{% url 'watson:generalquery' %}"> General Query </a></li>
+<hr>
+
+
+<li> <a href="{% url 'watson:singleword' %}"> Add a single word to model with sounds_like and display_as </a></li>
+<hr>
+
+<li> <a href="{% url 'watson:tempword2' %}"> List a single word to model with sounds_like and display_as </a></li>
+<hr>
+
+<!--
+<li> <a href="{% url 'watson:step9formword' %}"> Add a list of words at once </a></li>
+-->
+<li> <a href="{% url 'watson:multiword' %}"> Add multiple words </a></li>
+<hr>
+
+
+
+<li> <a href="{% url 'watson:step9home' %}"> List all step9 words and their soundslikes </a></li>
+<hr>
+
+
+</ul>
+
+
+{% endblock %}

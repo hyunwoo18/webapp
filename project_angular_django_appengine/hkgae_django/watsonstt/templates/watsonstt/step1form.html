@@ -1,0 +1,15 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+<h1> Upload a new credential </h1>
+
+<form action="/watson/step1form/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>
+
+
+<h1>  <a href="{% url 'watson:step1list' %}"> go back</a>  </h1>
+
+{% endblock %}

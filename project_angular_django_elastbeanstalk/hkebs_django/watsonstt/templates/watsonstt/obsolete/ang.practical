@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html ng-app="myApp">
+<head>
+  <title>The ReDeG</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+
+<body>
+
+<body ng-controller="HomeController">
+    <h1>{$message$}</h1>
+    <script src="app.js"></script>
+</body>
+
+<p>Write in the input field to add items.</p>
+
+<div ng-app="">
+ 
+<p>Input something in the input box:</p>
+<p>Name: <input type="text" ng-model="name"></p>
+<p ng-bind="name"></p>
+
+</div>
+
+<script>
+var app = angular.module('myApp', []).config([
+    '$httpProvider', 
+    '$interpolateProvider', 
+    function($httpProvider, $interpolateProvider) {
+        $interpolateProvider.startSymbol('{$');
+        $interpolateProvider.endSymbol('$}');
+        $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    }]); 
+
+app.controller('HomeController', function($scope) {
+  $scope.message = 'Hello from HomeController';
+});
+
+</script>
+
+</body>
+</html>

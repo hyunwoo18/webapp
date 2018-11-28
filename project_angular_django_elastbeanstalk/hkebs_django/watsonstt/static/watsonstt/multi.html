@@ -1,0 +1,26 @@
+    <div class="navbar">
+        <a class="navbar-brand" href="#">Watson Test</a>
+        <cart-summary />
+    </div>
+
+
+        <div class="well" ng-repeat="item in worddata">
+            <h3>
+                <span class="pull-left label label-primary">
+                    {$ item.word $}
+                </span>
+
+                <strong>{$item.disp$}</strong>
+
+		<span class="lead">{$item.sond$}</span>
+            </h3>
+
+            <button ng-click="addProductToCart(item)"  class="btn btn-success pull-right"> Add to cart </button>
+
+     </div>
+
+<!--
+<ul class="w3-ul">
+  <li ng-repeat="x in custdata" class="w3-padding-16">{$ x $} </li>
+</ul>
+-->

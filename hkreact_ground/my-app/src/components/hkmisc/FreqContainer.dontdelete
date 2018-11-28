@@ -1,0 +1,255 @@
+import React, { Component } from 'react';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
+import fire   from './fire';
+import Header from './Header';
+import hat from './images/hat.jpg';
+import ReactDOMServer from 'react-dom/server';
+const fetch = require("node-fetch");
+var divStyle = {    'borderStyle': 'solid',    'borderWitdh': '5px' };
+
+function Mycomp(props) {
+    const sidebar = (
+<dl>
+<dd className="clear"></dd>
+<dt> Basic </dt>
+<dd> Name: {props.limObject.name} </dd>
+
+<dd className="clear"></dd>
+<dt> Current </dt>
+<dd> Company: {props.limObject.current} </dd>
+
+<dd className="clear"></dd>
+<dt> Experience </dt>
+<dd>
+{ props.limObject.past.map( (item,i) => { return (<div style={divStyle}> <h2> {item.title} <span>{item.period}</span> </h2><p>{item.description}</p> </div> );})}
+</dd>
+</dl>   );
+    return (    <div>    {sidebar}    </div> );
+}
+
+class FreqContainer extends Component {
+    constructor(props) {
+	super(props);
+	this.state = {user: null, userid: null, myCopy: null, requestbool: false, responsebool: false, myRequest: null,  myusers: {name:"dummy"}, reqKey: null, resKey: null};
+
+	// current
+	this.showResume     = this.showResume.bind(this);
+	this.handleRequest   = this.handleRequest.bind(this);
+	this.handleResponse  = this.handleResponse.bind(this);
+	// experimental
+	this.myRef = React.createRef();
+	this.showUser       = this.showUser.bind(this);
+	this.hkRender       = this.hkRender.bind(this);
+	this.postData       = this.postData.bind(this);
+    }
+
+    componentDidMount() {
+        fire.auth().onAuthStateChanged(  user => {
+                if (user) {
+		    this.setState( { user             } );
+		    this.setState( { userid: user.uid } );
+		    fire.database().ref(  'users/' + user.uid  ).on('value', snapshot => {
+			    if ( snapshot.val() ) { console.log( snapshot.val() ); } else { console.log( "no resume" ); }
+			});
+		    let userlist;
+		    var hkref = fire.database().ref( 'users/' );
+		    hkref.once( 'value', snapshot => {
+			    if ( snapshot.val() ) {
+				const local_object = snapshot.val();
+				this.setState( { myusers: local_object } );
+				console.log( this.state.myusers );
+			    }
+			});
+		} else {		    console.log( "new user?" );		    this.props.history.push('/login');		}
+	    } );
+	//////////////////////////////////////////////////////
+        fire.database().ref(  'users/' + this.state.user.uid + '/friendrequests'  ).on('value', snapshot => {
+		if ( snapshot.val() ) {
+		    console.log( "there is a request" );
+		    console.log( snapshot.val() );
+		    let localKey = Object.keys(snapshot.val())[0];
+		    let localObj = snapshot.val()[localKey];
+		    if ( localObj.answer == 'maybe' ) {
+			this.setState( {reqKey: localKey } );
+			this.setState( {resKey: localObj.reqkey } );
+			this.setState( {reqObj: localObj } );
+			this.setState( {responsebool: true } );
+		    }
+		} else { console.log( "no request" ); }
+	    });
+
+
+    };
+
+    // so, this is how to create a new array under users/uid/
+    handleAdd1 = () => {
+	var hkref = fire.database().ref( 'users/' + this.state.user.uid + '/requests');
+	var newrequest = hkref.push();
+	newrequest.set( uploadarray2 );
+    };
+    // so, this is how to create and update
+    handleAdd = () => {
+	var hkref = fire.database().ref( 'users/' + this.state.user.uid + '/friendrequests');
+	var newrequest = hkref.push();
+	newrequest.set( uploadarray2 );
+    };
+    handleAdd2 = () => {
+        let uploadarray1 = [    {	period: '2012',	title:  'engineer',	description: 'maybe'    } ];
+        let uploadarray2 = [    {	inviter: this.state.user.uid,	invitee: this.state.user.uid,	answerr: 'maybe',	level: 0    } ];
+	fire.database().ref(  'users/' + this.state.user.uid ).set( { name: 'ken', current: 'strike',  past: uploadarray1, friendrequests: uploadarray2 } );
+    }
+
+    // these 2 functions are overridden by showResume that uses a state, a functional component
+    hkRender = ( hkobject ) => {  	return ReactDOMServer.renderToStaticMarkup( <div> <h3> {hkobject.name} </h3> </div> ) ;    }
+    showUser( hkkey, hkobject ) {  
+	const hknode = this.myRef.current;
+	hknode.innerHTML = this.hkRender( hkobject );
+    }
+
+    postData = (url, data) => {
+	return fetch( url, {
+		body: JSON.stringify( data ),
+                headers: { 'content-Type': 'application/json' },
+		method: 'POST'
+		    })
+    };
+
+    handleRequest(param) {
+
+        var uploadarray2 = {
+	    inviter: this.state.userid,
+	    invitee: param,
+	    answerr: 'maybe',
+	    level: 1
+	};
+	var hkref = fire.database().ref( 'users/' + this.state.user.uid + '/friendrequests');
+	var newrequest = hkref.push();
+	newrequest.set( uploadarray2 );
+
+        var uploadarray2 = {
+	    inviter: this.state.userid,
+	    invitee: param,
+	    answerr: 'maybe',
+	    level: 1,
+	    reqkey: newrequest.key
+	};
+
+	this.postData('https://us-central1-hkact1-22444.cloudfunctions.net/hkHello', uploadarray2 )
+	    .then(   data => console.log(   data  )  )
+	     .catch( error => console.error( error )  )
+		 
+        console.log( param );
+
+    };
+
+
+    showResume( hkkey, hkobject ) {  
+	this.setState(  {myCopy: <Mycomp limObject={hkobject} /> } );
+
+	this.setState(  {requestbool: true } );
+	this.setState(  {myRequest: hkkey } );
+	// the following did not work because seemingly the page produced was static, i.e. event handler did not get activated..
+	//const hkButton = ( <Button bsStyle="primary" onClick={ this.handleRequest.bind(this, hkkey) }> Friend Request </Button> );
+        //this.setState(  {myButton: hkButton } );
+	//<div dangerouslySetInnerHTML={ {__html: ReactDOMServer.renderToStaticMarkup( this.state.myButton ) } } >   </div>
+    }
+
+    //  <p onClick={this.showUser.bind(this, key, this.state.myusers[key] ) }> 
+    // <div ref={this.myRef}>
+
+
+
+    handleResponse( param_answer ) {
+
+	var hkref = fire.database().ref( 'users/' + this.state.userid + '/friendrequests/' + this.reqKey );
+	hkref.update(  {answer: param_answer } );
+
+	// have to upload a different data to the second URL (of FB function)
+	// answer = 'yes' or 'no'
+	// the original inviter's request id = this.state.resKey
+
+	//this.postData('https://us-central1-hkact1-22444.cloudfunctions.net/hkHello', uploadarray2 )
+	//.then(   data => console.log(   data  )  )
+	//.catch( error => console.error( error )  )
+
+	this.setState(  {responsebool: false }    );
+        console.log( param_answer );
+    };
+
+
+
+    /////////////////////////////////
+    render() {	
+
+return (
+
+<div>
+
+<Header> <Button bsStyle="primary" onClick={this.handleLogout}> Logout </Button> </Header>
+
+    {/* ================================================ */}
+<Grid fluid={true} className="text-center"> <Row>
+
+    {/* ========= LEFT ======================================= */}
+<Col sm={2} className="well">
+<div className="well"> <p><a href="#"> My Profile </a></p>     <img src={hat} className="img-circle" height="55" width="55" alt="Avatar" />
+
+
+    { Object.keys( this.state.myusers ).map( (key, id) => {  
+
+	if ( this.state.userid != key) {
+	    return (
+  <p onClick={this.showResume.bind(this, key, this.state.myusers[key])}>  
+  <a href="#">  {this.state.myusers[key].name} ( {this.state.myusers[key].current} ) </a>  </p>   
+		    );
+	}
+	    } ) }
+
+
+</div>
+</Col>
+
+
+    {/* ========== MAIN ====================================== */}
+<Col sm={7} className="page-wrap">
+<div>
+<div dangerouslySetInnerHTML={ {__html: ReactDOMServer.renderToStaticMarkup( this.state.myCopy ) } } />   
+
+    { this.state.requestbool  &&
+	    <Button bsStyle="primary" onClick={ this.handleRequest.bind(this, this.state.myRequest) }> Friend Request </Button>}
+
+</div>
+</Col>
+
+    {/* ================ RIGHT ================================ */}
+<Col sm={2} className="well">
+      <div class="thumbnail">
+<p>Upcoming Events:</p>        <img src={hat} alt="Paris" width="400" height="300" />
+<p><strong>Paris</strong></p>        <p>Fri. 27 November 2015</p>         <Button bsStyle="primary">Info</Button>
+      </div>
+
+      <div className="well">    
+
+    { this.state.responsebool  &&
+	    <Button bsStyle="primary" onClick={ this.handleResponse }> Accept </Button>
+    }
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</Col>
+    {/* ================================================ */}
+</Row> </Grid>  </div>
+			);    }
+}
+
+export default FreqContainer;

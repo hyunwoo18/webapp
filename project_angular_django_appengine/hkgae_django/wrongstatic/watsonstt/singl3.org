@@ -1,0 +1,35 @@
+<div class="bg-success text-white">
+<p> curl -u {$ creddata.username $}:{$ creddata.password $} -X POST --header "Content-type:application/json"
+ --data {$ dataoption $}
+https://stream.watsonplatform.net/speech-to-text/api/v1/customizations/{$ custdata.customid $}/words/{$ theword $} </p>
+</div>
+
+
+  <div>
+    New word:       <input type="text" ng-model="theword"><br>
+    its display_as: <input type="text" ng-model="thedisp"><br>
+  </div>
+
+<br>
+<hr>
+
+  <ul class="w3-ul">
+    <li ng-repeat="x in products" class="w3-padding-16">{$ x $}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+  </ul>
+
+  <div class="w3-container w3-light-grey w3-padding-16">
+    <div class="w3-row w3-margin-top">
+      <div class="w3-col s10">
+        <input placeholder="Add a new sounds_like here and click the Add button" ng-model="addMe" class="w3-input w3-border w3-padding">
+      </div>
+      <div class="w3-col s2">
+        <button ng-click="addItem()" class="w3-btn w3-padding w3-green">Add</button><br>
+      </div>
+    </div>
+  </div>
+ <br>
+<button id="appendbtn" ng-click="append()" class="btn btn-primary">Append a new word</button>
+
+<button id="fetchbtn" ng-click="fetch()" class="w3-btn w3-padding w3-green">fetchall</button>
+
+

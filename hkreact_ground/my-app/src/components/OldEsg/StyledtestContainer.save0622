@@ -1,0 +1,301 @@
+import React, { Component } from 'react';
+//import * as firebase from 'firebase';
+import styled from 'styled-components';
+import { Route, Link } from 'react-router-dom';
+
+import ruiz from './Alameda.jpg';
+import hats from './hats.jpg';
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//    width: 100%;
+//const Hpage = styled.div` position: absolute;top: 0; bottom: 0; right: 0; left: 0;`;
+const Hpage = styled.div` position: absolute; top: 60px; bottom: 0; right: 0; left: 0;`;
+const Entirepage = (props) => ( <Hpage> {props.children} </Hpage>  );
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+
+const Agatha1 = (props) => (  <img src={ruiz} /> ); 
+const Agatha2 = (props) => (  <img src={hats} /> ); 
+
+/////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+const Hcontainer = styled.div` display: flex; height: 100%; width: 100%; background: papayawhip;`;
+
+const hklist = [ 
+		{id: 1, tN: 1, name:'messi', dM: 1 },
+		{id: 2, tN: 2, name:'iniesta', dM: 2 },
+		{id: 3, tN: 3, name:'xavi', dM: 3 },  ];
+
+class MainSection extends Component {
+    //const MainSection = (props) => (
+    render() {
+	return(
+  <Hcontainer> <LeftBarSection />
+
+  <CenterSection mylist={hklist} />
+
+<RiteBarSection />   </Hcontainer> );
+    }
+}
+///////////////////////////////////////////////////////
+const Hside   = styled.div` flex-grow: 1; height: 100%; background-color: yellow;  text-align: center;`;
+const Hcenter = styled.div` flex-grow: 5; height: 100%; background-color: hotpink; text-align: center;`;
+const LeftBarSection = (props) => ( 
+  <Hside> 
+  <Link to='/test/main1'> Main 1 </Link>
+<br />
+  <Link to='/test/main2'> Main 2 </Link>
+
+<br />
+  <Link to='/test/main3'> Resume </Link>
+ </Hside>   );
+
+
+const RiteBarSection = (props) => ( <Hside>   <h3> Right 2 </h3>  </Hside>   );
+const CenterSection  = (props) => ( 
+<Hcenter> 
+   <h3> Center 2 </h3>  
+
+   <Route    path="/test/main1"  component={Agatha1} />
+   <Route    path="/test/main2"  component={Agatha2} />
+   <Route    path="/test/main3"  render={ () =>( <Postings mylist={props.mylist} /> ) } />
+</Hcenter> 
+);
+
+
+const Modalbox=styled.div` display:none;position:fixed;z-index:1;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:#474e5d;padding-top:50px;`;
+const Closebutton=styled.span`position:absolute;right:35px;top:15px;font-size:40px;font-weight:bold;color:#f1f1f1; &:hover{color:#f44336;cursor:pointer;}  `;
+const Fcontainer=styled.div` padding: 16px;`;
+const Input=styled.input` width:100%; padding:15px; margin: 5px 0 22px 0; display:inline-block; border:none; background:#f1f1f1;`;
+const Styledform=styled.form`    background-color: #fefefe;margin: 5% auto 15% auto;border: 1px solid #888;width: 50%; `;
+const Mmbutton=styled.button`background-color:#4CAF50;color:white;padding: 14px 20px;margin: 8px 0;border:none;cursor:pointer;width:100%;opacity:0.9;`;
+const Okaybtn=Mmbutton.extend` float: left; width: 50%;`;
+const Cancelbtn=Okaybtn.extend` padding: 14px 20px;background-color: #f44336;`;
+const Cleardiv=styled.div`    &:after {    content: "";    clear: both;    display: table; }  `;
+const Label=styled.label` text-align: left `;
+
+function Hkform(props) {
+    return (
+  <Styledform>
+    <Fcontainer>
+      <Label for="email"><b>Email</b></Label>     <Input type="text"     placeholder="Enter Email"    name="email" />
+      <Label for="psw"><b>Password</b></Label>     <Input type="password" placeholder="Enter Password" name="psw" />
+  <Cleardiv>  <Cancelbtn type="button" onClick={props.handle} >Cancel</Cancelbtn>   <Okaybtn>Submit</Okaybtn>  </Cleardiv>
+    </Fcontainer>
+  </Styledform>     ); }
+
+
+
+/////////////////////////////////////////////////////////////////
+class Hform extends Component {
+    state = {	fields: {	    name: '',	    email: ''	},    };
+
+    onFormSubmit = evt => {
+	console.log("on form submit");
+	evt.preventDefault();
+    };
+
+    onInputChange = evt => {
+	console.log("on Input Change");
+	//const fields = Object.assign({}, this.state.fields);
+	//fields[evt.target.name] = evt.target.value;
+	//this.setState({fields});
+    };
+
+    render() { return (
+    <div>
+      <h1>Sign Up Sheet</h1>
+      <form onSubmit={this.onFormSubmit}>
+          <input placeholder="Name"   name="name"  value={this.state.fields.name}   onChange={this.onInputChange} />
+          <input placeholder="Email"  name="email" value={this.state.fields.email}  onChange={this.onInputChange} />
+          <input type="submit" />
+        </form>
+      </div> ); }
+}
+
+
+//////////////////////////////////////////
+class Postings extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { resumeOne: null };
+	this.modalref = React.createRef();
+	this.mdnewref = React.createRef();
+	this.choutref = React.createRef();
+	this.handleOpene = this.handleOpene.bind(this);
+	this.handleClose = this.handleClose.bind(this);
+    }
+    
+    handleOpene = ( mid ) => {
+	const resm = this.props.mylist.find( (a) => a.id == mid );
+	this.setState( { resumeOne: resm } );
+	this.modalref.current.style.display='block';
+    }
+    handleClose = () => {this.modalref.current.style.display='none';}
+
+    handleOpen2 = () => {this.mdnewref.current.style.display='block';}
+    handleClos2 = () => {this.mdnewref.current.style.display='none';}
+
+
+    handleModal = ( openbool, hkref, mid ) => {
+	if ( mid ) {
+	    const resm = this.props.mylist.find( (a) => a.id == mid );
+	    this.setState( { resumeOne: resm } );
+	}
+
+	if ( openbool ) {
+	    hkref.current.style.display='block';
+	} else {
+	    hkref.current.style.display='none';
+	}
+    }
+
+
+
+
+    render() { return (
+<div>
+
+     <button onClick={ () => this.handleOpen2() }>New Posting</button>
+
+     <table>  <thead> <tr>  <th> number </th>  <th> Song </th>  <th> Seconds </th>  <th> Link 1 </th>  </tr>  </thead>
+        <tbody>
+     {
+	this.props.mylist.map( (track) => (
+              <tr key={track.id}>
+	      <td> {track.tN}   </td>	      <td> {track.name} </td>	      <td> {track.dM}  </td>	      
+	      <td>  <button onClick={ () => this.handleOpene(track.id) }>open</button>  </td>
+              </tr>         ))
+     }
+        </tbody>
+     </table>
+
+
+     <Modalbox innerRef={this.modalref}> <Closebutton onClick={this.handleClose}> &times; </Closebutton>
+
+        <h1> {this.state.resumeOne && this.state.resumeOne.name } </h1>
+
+        <Hkform handle={this.handleClose}/>
+     </Modalbox>
+
+
+     <Modalbox innerRef={this.choutref}> <Closebutton onClick={this.handleClose}> &times; </Closebutton>
+
+        <h1> {this.state.resumeOne && this.state.resumeOne.name } </h1>
+
+        <Hkform handle={this.handleClose}/>
+     </Modalbox>
+
+
+
+
+     <Modalbox innerRef={this.mdnewref}> <Closebutton onClick={this.handleClos2}> &times; </Closebutton>
+
+        <Hform handle={this.handleClos2}/>
+     </Modalbox>
+
+</div>
+  )  }
+}
+
+
+// jmay /////// payment //////////
+
+const Checkout = (props) => ( 
+      <div className="Checkout">
+
+      <OrderSummary duration={this.props.duration} discount={this.props.discount} tax={this.props.tax} price={this.props.price}  />
+      <PaymentForm onSubmit={this.props.onSubmit} />
+
+      </div>
+);
+
+const BasicInput = (props) => ( 
+      <div className="BasicInput">
+
+      <label htmlFor={props.name}>  {props.label}  </label>
+      <input id={props.name} type={props.type} placeholder={props.placeholder} />
+
+      </div>
+); 
+
+const ExpiryDate = (props) => ( 
+  
+      <div className="ExpiryDate">
+
+        <div>
+          <label>Expires on</label>
+          <div className="Expiry">
+            <select>
+              <option value="">January</option>
+              <option value="">February</option>
+              <option value="">March</option>
+              <option value="">April</option>
+              <option value="">May</option>
+              <option value="">June</option>
+              <option value="">July</option>
+              <option value="">August</option>
+              <option value="">September</option>
+              <option value="">October</option>
+              <option value="">November</option>
+              <option value="">December</option>
+            </select>
+            <select name="" id="">
+              <option value="">2016</option>
+              <option value="">2017</option>
+              <option value="">2018</option>
+              <option value="">2019</option>
+              <option value="">2020</option>
+              <option value="">2021</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="CVCField">
+          <label>CVC</label>
+          <input placeholder="000" type="number" />
+        </div>
+
+      </div>
+ );
+
+const CheckoutButton = (props) => (
+    return (
+      <div className="CheckoutButton">
+        <button>Book securely</button>
+        <span><i className="fa fa-fw fa-lock"></i> Your credit card information is encrypted</span>
+      </div>
+	    );
+
+const PaymentForm = (props) => (
+      <div className="PaymentForm">
+      <form onSubmit={props.onSubmit}>
+
+          <div className="Title">Payment information</div>
+
+          <BasicInput name="name" label="Name on credit card" type="text"   placeholder="John Smith" />
+          <BasicInput name="card" label="Credit card number"  type="number" placeholder="0000 0000 0000 0000" />
+          <ExpiryDate />
+          <CheckoutButton />
+
+        </form>
+      </div>
+	    );
+
+
+////////////////////////////////////////////////////////////
+class StyledtestContainer extends Component {
+    constructor(props) { super(props); }
+    render() {	return (  <Entirepage>  <MainSection />  </Entirepage> );  }
+}
+
+export default StyledtestContainer;
+
+
+

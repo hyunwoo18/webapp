@@ -1,0 +1,127 @@
+import React, { Component } from 'react';
+import { Grid, Row, Col, Navbar, Nav, NavItem } from 'react-bootstrap';
+
+import './myside.css';
+import './raul.css';
+
+class SideContainer extends Component {
+
+    state = {jobs: [
+    {id:0, url:'localhost/1', company_name:"raul1", term:'permanent', title:'engineer'},
+    {id:1, url:'localhost/2', company_name:"raul2", term:'permanent', title:'engineer'},
+    {id:2, url:'localhost/3', company_name:"raul3", term:'permanent', title:'engineer'} ],
+	     myrecords: [
+    { title: "Title1.", artist: "Artist that produced the record1.", releaseYear: "Year the record was released3." },
+    { title: "Title2.", artist: "Artist that produced the record2.", releaseYear: "Year the record was released3." },
+    { title: "Title3.", artist: "Artist that produced the record3.", releaseYear: "Year the record was released3." } ],
+	     editing: null
+    }
+
+    toggleEditing = ( itemId ) => {
+	this.setState( { editing: itemId } );
+    };
+
+    handleEditField = ( event ) => {
+	if ( event.keyCode === 13 ) {
+	    let target = event.target,
+		update = {};
+
+	    update._id = this.state.editing;
+	    update[ target.name ] = target.value;
+	}
+    };
+
+    handleEditItem = () => {
+	    let itemId = this.state.editing;
+    };
+
+
+    renderItemOrEditField( item ) {
+	if ( this.state.editing === item._id ) {
+	    return(
+		   <li key={ `editing-${ item._id }` } className="list-group-item">
+        <GridRow>
+          <GridColumn className="col-xs-12 col-sm-3">
+            <input onKeyDown={ this.handleEditField } type="text" className="form-control" ref={ `title_${ item._id }` } name="title" defaultValue={ item.title }  />
+          </GridColumn>
+
+          <GridColumn className="col-xs-12 col-sm-3">
+            <input onKeyDown={ this.handleEditField } type="text" className="form-control" ref={ `artist_${ item._id }` } name="artist" defaultValue={ item.artist } />
+          </GridColumn>
+          <GridColumn className="col-xs-12 col-sm-3">
+ <input onKeyDown={ this.handleEditField } type="text" className="form-control" ref={`releaseYear_${ item._id }`} name="releaseYear" defaultValue={ item.releaseYear }
+            />
+
+          </GridColumn>
+          <GridColumn className="col-xs-12 col-sm-3">
+		<SuccessButton onClick={ this.handleEditItem } label="Update Item" />
+          </GridColumn>
+        </GridRow>
+	   </li>
+	} else {
+		return ( 
+			<li onClick={ this.toggleEditing.bind( null, item._id ) }
+      key={ item._id }
+        className="list-group-item">
+	{ `${ item.title } by ${ item.artist } (${ item.releaseYear })` }
+			</li> )
+		    }
+	}
+    };
+
+
+
+
+
+    render() {
+	return (
+	    <Grid>
+            <Row>
+
+	    <Col sm={3} className="sidenav">
+	    <h1> HK Test 1</h1>
+  <a href="http://localhost">About</a>
+  <a href="http://localhost">Services</a>
+  <a href="http://localhost">Clients</a>
+            </Col>
+
+	    <Col sm={9} className="sidemain">
+     <div>
+        <h1>Jobs!</h1>
+		{this.state.jobs.map(  function(job) {
+			    return (
+			    <div key={job.url} className="job">
+    <a href={job.url}> 
+				{job.company_name} 
+			    is looking for a {job.term} {job.title} </a>
+            </div>
+				    );
+			})}
+      </div>
+
+
+            </Col>
+
+            </Row>
+
+
+
+
+            <Row>
+	    <ul className="list-group">
+	  {this.myrecords.map( ( item ) => {
+		      return this.renderItemOrEditField( item );
+		  })}
+	    </ul>
+
+            </Row>
+
+
+
+	    </Grid>
+    );
+  }
+}
+
+export default SideContainer;
+

@@ -1,0 +1,217 @@
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import { PersistGate } from 'redux-persist/integration/react';
+import React, { Component } from 'react';
+import { Switch, BrowserRouter, Route, Redirect, withRouter, Link } from 'react-router-dom';
+import { createStore, combineReducers } from 'redux';
+import { Provider }            from 'react-redux';
+
+import uuid from 'uuid';
+import HireeContainer     from './HireeContainer';
+import HirerContainer     from './HirerContainer';
+import ESGLoginContainer  from './ESGLoginContainer';
+import BinaryContainer    from './BinaryContainer';
+import ChattContainer     from './ChattContainer';
+
+import {Mainground, Hkbtndanger, Hhr} from './ESGMainContainer';
+import {Header} from './VariousHeaders';
+import {Hkform} from './SignupForms';
+
+import uuid from 'uuid';
+
+//// begin reducer
+const reducer = combineReducers( { 
+				    activeThreadId: activeThreadIdReducer, 
+				    threads:        threadsReducer, 
+				    myresume:       resumeReducer, 
+                                    postings:       postingsReducer,
+				    uploadmessage:  uploadmsgReducer,
+				} );
+// take current state and an action AND return a new state
+function activeThreadIdReducer(state = '1-fca2', action) {
+    if ( action.type === 'OPEN_THREAD' ) { return action.id; } 
+    else                                 { return state;  }
+}
+function resumeReducer(state={ fname: 'messi', lname: 'iniesta', company: 'apple', workarray:[ {period: "1970", title: "engineer"} ], }, action) {
+    if ( action.type === 'UPDATE_RESUME' ) { console.log("update resume dispatch called");  return action.myresume; } 
+    else                                   { return state;  }
+}
+function postingsReducer(state=[], action) {
+    if ( action.type === 'ADD_POSTING' ) { 
+	console.log("add new post dispatch called");  
+	
+        let newarray = state.slice();
+        newarray.push( action.newposting );
+
+	let newerarray = newarray.map( (onepost, id) => { onepost.hkid = id; return onepost; } );
+	console.log( newerarray );
+	return newerarray;
+    } 
+    else                                   { return state;  }
+}
+// take current state and an action AND return a new state
+function threadsReducer(state = [
+ {  id: '1-fca2',    title: 'Aldrin',  messages: messagesReducer(undefined, {}), },
+ {  id: '2-be91',    title: 'Colins',  messages: messagesReducer(undefined, {}), },  ], action) {
+    switch (action.type) {
+    case    'ADD_MESSAGE':
+    case 'DELETE_MESSAGE': {
+      const threadIndex = findThreadIndex(state, action);
+      const oldThread = state[threadIndex];
+      const newThread = {	  ...oldThread,	  messages: messagesReducer(oldThread.messages, action),       };
+      return [	      ...state.slice(0, threadIndex),	      newThread,	      ...state.slice( threadIndex + 1, state.length ),	      ];
+    }
+    default: { return state; }
+    } // end switch
+}
+function findThreadIndex(threads, action) {
+    switch (action.type) {
+      case    'ADD_MESSAGE': { return threads.findIndex( (t) => t.id === action.threadId );      }
+      case 'DELETE_MESSAGE': { return threads.findIndex( (t) => t.messages.find((m) => ( m.id === action.id )) ); }
+    default: { console.log("what"); }
+    }
+}
+function messagesReducer(state = [], action) {
+    switch (action.type) {
+      case 'ADD_MESSAGE': {
+	const newMessage = { text: action.text, timestamp: Date.now(), id: uuid.v4(), };
+	return state.concat( newMessage );
+      }
+      case 'DELETE_MESSAGE': { return state.filter( m => m.id !== action.id );     }
+      default:               { return state; }
+    } // end switch
+}
+//// end reducer //////////////////////////////
+
+///////////////// begin Chatt Reducer
+function uploadmsgReducer(state = 'initial message', action) {
+    if ( action.type === 'UPLOAD_MESSAGE' ) { 
+	const newMessage = {
+	    msg: action.mymessage,
+	    timestamp: Date.now(),
+	    mid: uuid.v4(),
+	    author: 'h18@example.com',
+	    userid: 18,
+	}
+	//firebase.database().ref('messages').push(newMessage);
+	return newMessage; 
+    } 
+    else                                    { return state;  }
+}
+
+
+
+
+
+
+
+
+///////////////// enddd Chatt Reducer
+
+
+
+
+
+//const store = createStore(reducer);
+class App extends Component {
+    constructor(props) {        	super(props);        	this.state = { isLoggedIn:false };      };
+    handleInn    = () => { this.setState( { isLoggedIn:true } );                                    };
+    handleHiree  = () => { this.setState( { isLoggedIn:true } ); this.props.history.push('/hiree')  };
+    handleHirer  = () => { this.setState( { isLoggedIn:true } ); this.props.history.push('/hirer')  };
+
+    handleSignup = () => { 
+	//this.setState( { isLoggedIn:true,  redirect: false } ); not working, i.e. more complicated than the next line
+	this.props.history.push('/signup') 
+    };
+
+    handleOut    = () => { this.setState( { isLoggedIn:false } ); };
+    //renderRedirect = () => { if (this.state.redirect) { return <Redirect to='/' />  }  else  { return <Redirect to='/hiree/main2' /> } };
+    handleCancel = () => { this.props.history.push('/');        }
+    render() {	
+
+	const mainConsole = this.state.isLoggedIn ?
+	    (
+
+
+<Mainground>  
+<Header>
+<Hkbtndanger> <Link to='/hiree'> Hiree </Link> </Hkbtndanger>
+<Hkbtndanger> <Link to='/hirer'> Hirer </Link> </Hkbtndanger>
+<Hkbtndanger> <Link to='/chatt'> Chatt </Link> </Hkbtndanger>
+<Hkbtndanger onClick={this.handleOut}> Logout  </Hkbtndanger>
+</Header>
+
+<Hhr />
+<Switch>
+	     <Route exact path="/"  render={ ()=>(<BinaryContainer/>) } /> 
+             <Route   path="/hiree"  component={HireeContainer} />
+             <Route   path="/hirer"  component={HirerContainer} /> 
+             <Route   path="/chatt"  component={ChattContainer} /> 
+</Switch>
+</Mainground> 
+
+
+	     ) :  ( 
+
+
+<div>
+
+<Switch>
+
+<Route exact path="/"  render={ ()=>( <ESGLoginContainer  onClick={this.handleInn} signupClick={this.handleSignup}
+hireeClick={this.handleHiree} hirerClick={this.handleHirer}                                      />  )  }  />
+
+<Route path="/signup"  render={ ()=>( <Hkform             handle={this.handleCancel} />  )  }  />
+	     <Route   path="/hiree" render={ ()=> <Redirect to='/' />} />
+	     <Route   path="/hirer" render={ ()=> <Redirect to='/' />} />
+	     <Route   path="/chatt" render={ ()=> <Redirect to='/' />} />
+</Switch>
+
+</div>
+
+
+	      );
+	// HK using renderRedirect is causing some errors, 
+	// HK rather I have to find a smart combinational use of this.state.isLoggedIn and <Route path="/hiree" render={ ()=> <Redirect to='/'
+	// HK i.e. handleOut just sets the state, isLoggedIn which initiates a rerender
+	// and then inside this ternary condition, a proper <Route should catch all possible existing paths and then redirect to the login page
+	return ( <div> 	 {mainConsole} 		 </div>    );
+    } // end render
+}
+
+//<Hkbtndanger> <Link to='/main'>  ESG Main    </Link> </Hkbtndanger>
+//	     <Route   path="/main"  render={ ()=>(<ESGMainContainer onClick={()=>this.handleOut()} />) }  />
+//	     <Route   path="/main" render={ ()=> <Redirect to='/' />} />
+
+/////////////////////////////
+// https://github.com/rt2zz/redux-persist
+//https://stackblitz.com/edit/redux-persist
+const persistConfig = {
+    key: 'root',
+    storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, reducer);
+let store = createStore(persistedReducer);
+let persistor = persistStore(store);
+
+// withRouter(App) should be inside <BrowserRouter>
+// and <Provider store={store}> should be also inside <BrowserRouter>
+// update:<Provider store={store}> should include <PersistGate loading={null} persistor={persistor}> which then includes  <BrowserRouter>
+const Apphk = withRouter(App);
+const WrappedApp = () => (
+
+    <Provider store={store}>  
+        <PersistGate loading={null} persistor={persistor}>
+
+<BrowserRouter basename='/'>
+ 	    <Apphk />  
+</BrowserRouter>
+
+        </PersistGate>
+    </Provider> 
+
+ );
+
+export default WrappedApp;
+

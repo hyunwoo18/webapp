@@ -1,0 +1,107 @@
+import React, { Component } from 'react';
+import { Button, Grid, Row, Col, Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import * as firebase from 'firebase';
+import './login.css';
+
+import './agency.css';
+
+class LoginContainer extends Component {
+  state = { email: '', password: '', error: '' };
+
+  handleEmailChange = event => {
+    this.setState({ email: event.target.value });
+  };
+
+  handlePasswordChange = event => {
+    this.setState({ password: event.target.value });
+  };
+
+  handleSubmit = event => {
+    event.preventDefault();
+    this.setState({ error: '' });
+    if (this.state.email && this.state.password) {
+      this.login();
+    } else {
+      this.setState({ error: 'Please fill in both fields.' });
+    }
+  };
+
+  onLogin() {
+    this.props.history.push("/");
+  }
+
+  login() {
+    firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+      .then(res => {
+        this.onLogin();
+      })
+      .catch(error => {
+        if (error.code === 'auth/user-not-found') {
+          this.signup();
+        } else {
+          this.setState({ error: 'Error logging in.' });
+        }
+      });
+  }
+
+  signup() {
+    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .then(res => {
+        this.onLogin();
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({ error: 'Error signing up.' });
+      });
+  }
+
+  render() {
+
+    return (
+
+      <div className="login-div">
+
+      {/*        <form onSubmit={this.handleSubmit}>   
+          <button className="red light" type="submit">
+            Login
+          </button>
+       */}
+
+      <h3>Sign in or sign up by entering your email and password.</h3>
+
+      <Form horizontal onSubmit={this.handleSubmit}>
+
+  <FormGroup controlId="formHorizontalEmail">
+      <Col componentClass={ControlLabel} sm={2}>
+      Email
+    </Col>
+      <Col sm={6}>
+      <FormControl type="email" onChange={this.handleEmailChange}   placeholder="Email" />
+    </Col>
+  </FormGroup>
+
+
+  <FormGroup controlId="formHorizontalPassword">
+      <Col componentClass={ControlLabel} sm={2}>
+      Password
+    </Col>
+      <Col sm={6}>
+      <FormControl type="password" onChange={this.handlePasswordChange}  placeholder="Password" />
+    </Col>
+  </FormGroup>
+
+  <FormGroup>
+      <Col smOffset={2} sm={6}>
+      <Button bsStyle="success" type="submit" style={{ width: '100%' }} >Sign in</Button>
+    </Col>
+  </FormGroup>
+      </Form>
+
+      </div>
+
+
+    );
+  }
+}
+
+export default LoginContainer;

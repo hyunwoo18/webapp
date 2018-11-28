@@ -1,0 +1,23 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+
+<h1> Select your credential and customization ID to issue a general query </h1>
+
+<form action="/watson/generalquery/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>
+
+<h1> Or we can construct the entire command from existing crendential and customization </h1>
+
+<h3> <a href="{% url 'watson:executequery' %}">  {{ message }}  </a> </h3>
+
+<h1> <a href="{% url 'watson:start' %}"> Go to Starting page</a> </h1>
+<br>
+<h1> <a href="{% url 'watson:step1list' %}"> Go to credential page </a></h1>
+<br>
+<h1> <a href="{% url 'watson:step2list' %}"> Go to custimization ID </a></h1>
+
+{% endblock %}

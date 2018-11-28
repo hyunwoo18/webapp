@@ -1,0 +1,11 @@
+ {/*                                                                                                                                                                      
+<div onClick={ this.togglePastEditing.bind( null, id ) } key={ id } >
+<h2> {item.title} <span> {item.period} </span> </h2>
+<p> { item.description } </p>
+</div>
+ */}
+
+
+
+
+<li onClick={ this.togglePastEditing.bind( null, id ) } key={ id } > { `Period: ${ item.period } Title: ${ item.title } (${ item.description })` } </li>

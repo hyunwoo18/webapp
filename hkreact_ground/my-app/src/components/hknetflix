@@ -1,0 +1,19 @@
+<div id="hero" className="Hero" style={{backgroundImage: `url(${hat})`}}>
+ <div className="content">
+
+                <h2>Jobs Site!</h2>
+
+       <div className="button-wrapper">
+          <HeroButton primary={true} text="Jobs Now" />
+          <HeroButton primary={false} text="Upload Jobs" />
+      </div>
+
+ </div>
+
+ <div className="overlay">
+ </div>
+
+</div>
+
+
+

@@ -1,0 +1,209 @@
+import React, { Component } from 'react';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
+import fire   from './fire';
+import Header from './Header';
+import hat from './images/hat.jpg';
+
+import ReactDOMServer from 'react-dom/server';
+
+const fetch = require("node-fetch");
+
+var divStyle = {
+    'border-style': 'solid',
+    'border-witdh': '5px'
+};
+
+
+function Mycomp(props) {
+
+    const sidebar = (
+<dl>
+
+<dd className="clear"></dd>
+<dt> Basic </dt>
+<dd>
+Name: {props.limObject.name}
+</dd>
+
+<dd className="clear"></dd>
+<dt> Current </dt>
+<dd>
+Company: {props.limObject.current}
+</dd>
+
+<dd className="clear"></dd>
+<dt> Experience </dt>
+<dd>
+{ props.limObject.past.map( (item,i) => { return (<div style={divStyle}> <h2> {item.title} <span>{item.period}</span> </h2><p>{item.description}</p> </div> );})}
+</dd>
+
+</dl>
+
+  );
+
+    return (    <div>    {sidebar}    </div> );
+}
+
+
+class FreqContainer extends Component {
+
+    constructor(props) {
+	super(props);
+	this.state = { user: null,  myCopy: null, myButton:null,  myusers: {name:"dummy"}  };
+
+	// current
+	this.showResume     = this.showResume.bind(this);
+
+	// experimental
+	this.myRef = React.createRef();
+	this.showUser       = this.showUser.bind(this);
+	this.hkRender       = this.hkRender.bind(this);
+    }
+
+    componentDidMount() {
+
+        fire.auth().onAuthStateChanged(  user => {
+                if (user) {
+		    this.setState( { user }  );
+		    fire.database().ref(  'users/' + user.uid  ).on('value', snapshot => {
+			    if ( snapshot.val() ) {
+				console.log( snapshot.val() );
+			    } else { console.log( "no resume" ); }
+			});
+
+		    let userlist;
+		    var hkref = fire.database().ref( 'users/' );
+
+		    hkref.once( 'value', snapshot => {
+			    if ( snapshot.val() ) {
+				let local_object = snapshot.val();
+				this.setState( { myusers: local_object } );
+				console.log( this.state.myusers );
+				//var hklist = Object.keys( snapshot.val() );
+				//console.log( hklist );
+			    }
+			});
+		} else {		    console.log( "new user?" );		    this.props.history.push('/login');		}
+	    } );
+    };
+
+
+    // so, this is how to create a new array under users/uid/
+    handleAdd1 = () => {
+        let uploadarray2 = {
+	inviter: this.state.user.uid,
+	invitee: this.state.user.uid,
+	answerr: 'maybe',
+	level: 1
+	};
+	var hkref = fire.database().ref( 'users/' + this.state.user.uid + '/requests');
+	var newrequest = hkref.push();
+	newrequest.set( uploadarray2 );
+    };
+    // so, this is how to create and update
+    handleAdd = () => {
+        let uploadarray2 = {
+	inviter: this.state.user.uid,
+	invitee: this.state.user.uid,
+	answerr: 'maybe',
+	level: 1
+	};
+	var hkref = fire.database().ref( 'users/' + this.state.user.uid + '/friendrequests');
+	var newrequest = hkref.push();
+	newrequest.set( uploadarray2 );
+    };
+
+    handleAdd2 = () => {
+        let uploadarray1 = [    {	period: '2012',	title:  'engineer',	description: 'maybe'    } ];
+        let uploadarray2 = [    {	inviter: this.state.user.uid,	invitee: this.state.user.uid,	answerr: 'maybe',	level: 0    } ];
+
+	fire.database().ref(  'users/' + this.state.user.uid ).set( { name: 'ken', current: 'strike',  past: uploadarray1, friendrequests: uploadarray2 } );
+
+    //var hkbasic = "Basic ";                                                                                                                    
+    //var hkbase = Buffer.from("username:password").toString('base64');                                                                          
+    //var hkstring = hkbasic.concat( hkbase );                                                                                                   
+    //console.log( hkstring );                                                                                                                   
+	//URL = "";
+	//return fetch( url, {
+	//body: JSON.stringify( data ),
+	//headers: {
+	//'authorization':'Basic Y==',
+	//'content-Type': 'application/json'
+	//},
+	//method: 'POST'
+	//})        //.then( response => response.json() ) 
+    }
+
+    // these 2 functions are overridden by showResume that uses a state, a functional component
+    hkRender = ( hkobject ) => {  	return ReactDOMServer.renderToStaticMarkup( <div> <h3> {hkobject.name} </h3> </div> ) ;    }
+    showUser( hkkey, hkobject ) {  
+	const hknode = this.myRef.current;
+	hknode.innerHTML = this.hkRender( hkobject );
+    }
+
+
+
+
+
+    handleRequest = (param) => {
+	//fire.database().ref(  'users/' + this.state.user.uid + '/friendrequests'  ).on('value', snapshot => {
+	//if ( snapshot.val() ) {
+	//    console.log( "there is a request" );
+	//    console.log( snapshot.val() );
+	//} else { console.log( "no request" ); }
+	//  });
+
+	console.log( param );
+
+    };
+
+    showResume( hkkey, hkobject ) {  
+	this.setState(  {myCopy: <Mycomp limObject={hkobject} /> } );
+
+	const hkButton = ( <Button bsStyle="primary" onClick={ this.handleRequest.bind(this, hkkey) }> Friend Request </Button> );
+	this.setState(  {myButton: hkButton } );
+    }
+
+    //  <p onClick={this.showUser.bind(this, key, this.state.myusers[key] ) }> 
+    // <div ref={this.myRef}>
+    /////////////////////////////////
+    render() {	return (
+
+<div>
+
+<Header> <Button bsStyle="primary" onClick={this.handleLogout}> Logout </Button> </Header>
+
+    {/* ================================================ */}
+<Grid fluid={true} className="text-center"> <Row>
+
+    {/* ========= LEFT ======================================= */}
+<Col sm={2} className="well">
+<div className="well"> <p><a href="#"> My Profile </a></p>     <img src={hat} className="img-circle" height="55" width="55" alt="Avatar" />
+
+    { Object.keys( this.state.myusers ).map( (key, id) => { return (
+  <p onClick={this.showResume.bind(this, key, this.state.myusers[key])}>  
+  <a href="#">  {this.state.myusers[key].name} ( {this.state.myusers[key].current} ) </a>  </p>   ) } ) }
+</div>
+</Col>
+
+
+    {/* ========== MAIN ====================================== */}
+<Col sm={7} className="page-wrap">
+<div dangerouslySetInnerHTML={ {__html: ReactDOMServer.renderToStaticMarkup( this.state.myCopy   ) } } >   </div>    
+<div dangerouslySetInnerHTML={ {__html: ReactDOMServer.renderToStaticMarkup( this.state.myButton ) } } >   </div>
+</Col>
+
+    {/* ================ RIGHT ================================ */}
+<Col sm={2} className="well">
+      <div class="thumbnail">
+<p>Upcoming Events:</p>        <img src={hat} alt="Paris" width="400" height="300" />
+<p><strong>Paris</strong></p>        <p>Fri. 27 November 2015</p>         <Button bsStyle="primary">Info</Button>
+      </div>
+      <div className="well">        <p>ADS</p>      </div>
+</Col>
+    {/* ================================================ */}
+</Row> </Grid>  </div>
+			);    }
+}
+
+export default FreqContainer;

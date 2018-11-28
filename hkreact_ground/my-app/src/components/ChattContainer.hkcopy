@@ -1,0 +1,117 @@
+import React, { Component } from 'react';
+import styled from 'styled-components';
+import { connect }  from 'react-redux';
+import { Route, Link, Redirect } from 'react-router-dom';
+import {Hside, Hcenter, Fnav, Fsidebarheader, Fsidebarmain, Ulnavflexcolumn, Specialli, Lii}   from './CommonContainer';
+import {Hkbtndanger}   from './ESGMainContainer';
+
+const Checkout = (props) => ( <div>  <ChattPresenter {...props} />  </div>  );
+const mapStateToCheckoutProps    = (state)    => ( { myresume: state.myresume, } );
+const mapDispatchToCheckoutProps = (dispatch) => ( { onMessageClick: (resume) => ( dispatch( updateResume(resume) )  ), } );
+function updateResume(resume) {    return { type: 'UPDATE_RESUME',  myresume: resume, };   }
+const ChattContainer = connect( mapStateToCheckoutProps, mapDispatchToCheckoutProps )( Checkout );
+
+////////////////////////////////////////
+class ChattPresenter extends Component {
+    constructor(props) {  
+	super(props);    
+	this.friends = [ {id:1, name:'kim1', messages:[{id:1, msg:"fuck you"}] }, {id:2, name:'kim2', messages:[{id:2, msg:"dick head"}] } ]
+    }
+    //componentDidMount() { }
+    render() {
+	const matchPath = this.props.match.path;
+	return ( <Entirepage> <MainSection matchpath={matchPath} hkfriends={this.friends} />  </Entirepage>    );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const Entirepage = (props) => ( <div> {props.children} </div>  );
+const Hcontainer = styled.div` display: flex; height: 100%; width: 100%;`;
+////////////////////////////
+
+const MainSection = (props) => (
+                <Hcontainer>
+		<LeftBarSection matchpath={props.matchpath}  hkfriends={props.hkfriends} />
+                <CenterSection  matchpath={props.matchpath}  hkfriends={props.hkfriends} />
+                  <RiteBarSection />
+                </Hcontainer> );
+
+//////////////////////////
+const LeftBarSection=(props)=> {
+    //    let path0=props.matchpath; let path1=path0.concat("/main1"); let path2=path0.concat("/main2"); let path3=path0.concat("/main3");
+    return (
+<Hside><Fnav> <Fsidebarheader> Sidebar </Fsidebarheader>
+<Fsidebarmain> <Ulnavflexcolumn>
+<Specialli> My Links </Specialli>
+{
+    props.hkfriends.map(  (hkfriend) => (
+	 <Lii>     <Hkbtndanger> <Link   to={`${props.matchpath}/${hkfriend.id}`}  > {hkfriend.name} </Link> </Hkbtndanger> </Lii>
+					 ) )
+}
+</Ulnavflexcolumn> </Fsidebarmain> </Fnav> </Hside>
+	    ); }
+
+const RiteBarSection=(props) => ( <Hside>   <h3> Right  </h3>  </Hside>   );
+////////////////////////////////////////////////////////////////////////////////////
+const CenterSection  = (props) => {
+    //    let path0=props.matchpath; let path1=path0.concat("/main1"); let path2=path0.concat("/main2"); let path3=path0.concat("/main3");
+    return (
+   <Hcenter>
+   <Route       path={`${props.matchpath}/:id`} render={  ({ match }) => {
+		    const oneposting = props.hkfriends.find( (a) => a.id == match.params.id  );
+		    return ( <ThreadContainer hkid={match.params.id} messages={oneposting.messages}  /> ); } } />
+   <Route exact path={props.matchpath} render={ ()=>( <div> <h3>Please select an album on the left</h3> </div>   )} />
+   </Hcenter>
+  );
+}
+
+export default ChattContainer;
+//////////////////////
+
+const mapStateToThreadProps    = (state)    => ( { myresume: state.myresume, } );
+const mapDispatchToThreadProps = (dispatch) => ( { onMessageClick: (message) => ( dispatch( updateMessages(message) )  ), } );
+function updateMessages(resume) {    return { type: 'UPLOAD_MESSAGE',  mymessage: message, };   }
+const ThreadContainer = connect( mapStateToThreadProps, mapDispatchToThreadProps )(  ThreadPresenter  );
+
+class ThreadPresenter extends Component {
+    constructor(props) {
+        super(props);
+	state = { newMessage: '' };
+    };
+
+    handleInputChange = e => {
+	this.setState({ newMessage: e.target.value });
+    };
+
+    handleSubmit = () => {
+	this.props.onMessageClick(this.state.newMessage);
+	this.setState({ newMessage: '' });
+    };
+
+    handleKeyDown = () => {  console.log("test2") }
+
+
+    render() {
+	return (
+<div>
+<h2> Showing messages with the friend number {this.props.hkid} </h2>
+
+         <div>
+	      {this.props.messages.map((msg,i) => ( <div key={msg.id}> <h3>{msg.msg}</h3> </div> ) ) }
+         </div>
+
+         <div id="chat-input">
+          <textarea  placeholder="Add your message..." onChange={this.handleInputChange} onKeyDown={this.handleKeyDown} />
+          <button onClick={this.handleSubmit}>
+            <svg viewBox="0 0 24 24">   <path fill="#424242" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />  </svg>
+          </button>
+        </div>
+
+</div>
+
+		);
+
+
+    }
+
+}

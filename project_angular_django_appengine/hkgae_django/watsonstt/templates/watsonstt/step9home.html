@@ -1,0 +1,21 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+<h1> List step9 words and their soundslikes </h1>
+
+<ul>
+{% for word in wordlist %}
+
+     <li> {{ word.hkword }} -- {{ word.hkdisp }}   <a href="{% url 'watson:step9editword' word.id %}"> add more soundslike </a> <a href="{% url 'watson:step9soundaword' word.id %}"> delete a sound? </a>   <a href="{% url 'watson:step9deleteword' word.id %}"> delete the word? </a>  </li>
+<ul>
+    {% for sound in word.sound_set.all %}
+        <li>{{ sound.hksoundslike }} -- {{ sound.hkwordkey }}</li>
+    {% endfor %}
+</ul>
+
+
+{% endfor %}
+</ul>
+
+{% endblock %}
+

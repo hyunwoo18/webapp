@@ -1,0 +1,8 @@
+<h1> List Sound </h1>
+
+<ul>
+{% for sound in soundlist %}
+     <li>{{ sound.hkwordkey }} sounds like {{ sound.hksoundslike }} <a href="{% url 'watson:tempword5' sound.id %}"> delete? </a>  </li>
+{% endfor %}
+</ul>
+

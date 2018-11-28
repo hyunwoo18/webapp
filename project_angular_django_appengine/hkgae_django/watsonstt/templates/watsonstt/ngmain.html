@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html ng-app="myShoppingList">
+<head>
+{% load static %}
+<title>The ReDeG</title>
+<script src="{% static 'angular.js' %}"></script>
+<script src="{% static 'angular-route.js' %}"></script>
+<script src="{% static 'jquery-3.2.0.js' %}"></script>
+<link  href="{% static 'bootstrap.css' %}" rel="stylesheet">
+<script src="{% static 'bootstrap.js' %}"></script>
+<script src="{% static 'watsonstt/ngmain.js' %}"></script>
+<base href="/watson/ngmain/">
+</head>
+
+<body ng-controller="myCtrl" >
+
+<!-- +++++++++++++++++++++++++++++++++++++++++ -->
+<div class="row" ng-show="showbasics">
+
+<div class="col-xs-6">
+<p> Initial Cred {$ creddata $} </p> 
+<button class="btn btn-primary" ng-click="showCred()">For new cred, click</button>
+<div ng-show="credinput">
+<button class="btn btn-primary" ng-click="hideCred()">Hide</button>
+<input placeholder="New Username" ng-model="newUsername" class="w3-input w3-border w3-padding">
+<input placeholder="New Password" ng-model="newPassword" class="w3-input w3-border w3-padding">
+<button ng-click="sendNewCred()" class="btn btn-danger">Send a new cred</button><br>
+</div>
+</div>
+
+<div class="col-xs-6">
+<p> Initial Customization {$ custdata $} </p> 
+<button class="btn btn-primary" ng-click="showCust()">For new cust, click</button>
+<div ng-show="custinput">
+<button class="btn btn-primary" ng-click="hideCust()">Hide</button>
+<input placeholder="Name"  ng-model="newName"  class="w3-input w3-border w3-padding">
+<input placeholder="Modl"  ng-model="newModl"  class="w3-input w3-border w3-padding">
+<input placeholder="Desc"  ng-model="newDesc"  class="w3-input w3-border w3-padding">
+<button ng-click="sendNewCust()" class="btn btn-danger">Send a new cust</button><br>
+</div>
+</div>
+
+</div>
+<!-- +++++++++++++++++++++++++++++++++++++++++ -->
+<div class="panel panel-default row" ng-controller="myCtrl">
+
+<div class="col-xs-3">
+<ur>
+<li> <a href="/watson/ngmain" class="btn btn-success">Home</a>                 </li> <hr>
+<li> <a href="enterword"      class="btn btn-success">Enter or Modify Word</a> </li> <hr>
+<li> <a href="multiword"      class="btn btn-primary">Multiple words</a>       </li> <hr>
+<li> <a href="singleword"     class="btn btn-warning">Single word</a>          </li> <hr>
+<li> <a href="uplod"          class="btn btn-warning">Uplod</a>                </li> <hr>
+<li> <button class="btn btn-primary" ng-click="showBasics()">Show Basics</button><button class="btn btn-primary" ng-click="hideBasics()" ng-show="showbasics">Hide</button></li>
+</ul>
+</div>
+
+<div class="col-xs-8">  <div ng-view></div>  </div>
+</div>
+
+</body>
+</html>

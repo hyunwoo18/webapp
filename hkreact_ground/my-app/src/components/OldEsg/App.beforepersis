@@ -1,0 +1,133 @@
+import React, { Component } from 'react';
+import { Route, Redirect, withRouter, Link } from 'react-router-dom';
+import { createStore, combineReducers } from 'redux';
+import { Provider }            from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import uuid from 'uuid';
+import HireeContainer     from './HireeContainer';
+import HirerContainer     from './HirerContainer';
+//import ESGMainContainer   from './ESGMainContainer';
+import ESGLoginContainer  from './ESGLoginContainer';
+import BinaryContainer    from './BinaryContainer';
+import {Mainground, Header, Hkbtndanger, Hhr} from './ESGMainContainer';
+
+//// begin reducer
+const reducer = combineReducers( { activeThreadId: activeThreadIdReducer, threads: threadsReducer, myresume: resumeReducer, } );
+// take current state and an action AND return a new state
+function activeThreadIdReducer(state = '1-fca2', action) {
+    if ( action.type === 'OPEN_THREAD' ) { return action.id; } 
+    else                                 { return state;  }
+}
+function resumeReducer(state={ fname: 'messi', lname: 'iniesta', company: 'apple', workarray:[ {period: "1970", title: "engineer"} ], }, action) {
+    if ( action.type === 'UPDATE_RESUME' ) { console.log("update resume dispatch called");  return action.myresume; } 
+    else                                   { return state;  }
+}
+// take current state and an action AND return a new state
+function threadsReducer(state = [
+ {  id: '1-fca2',    title: 'Buzz Aldrin',      messages: messagesReducer(undefined, {}), },
+ {  id: '2-be91',    title: 'Michael Collins',  messages: messagesReducer(undefined, {}), },  ], action) {
+    switch (action.type) {
+    case    'ADD_MESSAGE':
+    case 'DELETE_MESSAGE': {
+      const threadIndex = findThreadIndex(state, action);
+      const oldThread = state[threadIndex];
+      const newThread = {	  ...oldThread,	  messages: messagesReducer(oldThread.messages, action),       };
+      return [	      ...state.slice(0, threadIndex),	      newThread,	      ...state.slice( threadIndex + 1, state.length ),	      ];
+    }
+    default: { return state; }
+    } // end switch
+}
+function findThreadIndex(threads, action) {
+    switch (action.type) {
+      case    'ADD_MESSAGE': { return threads.findIndex( (t) => t.id === action.threadId );      }
+      case 'DELETE_MESSAGE': { return threads.findIndex( (t) => t.messages.find((m) => ( m.id === action.id )) ); }
+    default: { console.log("what"); }
+    }
+}
+function messagesReducer(state = [], action) {
+    switch (action.type) {
+      case 'ADD_MESSAGE': {
+	const newMessage = { text: action.text, timestamp: Date.now(), id: uuid.v4(), };
+	return state.concat( newMessage );
+      }
+      case 'DELETE_MESSAGE': { return state.filter( m => m.id !== action.id );     }
+      default:               { return state; }
+    } // end switch
+}
+
+//// end reducer //////////////////////////////
+
+const store = createStore(reducer);
+class App extends Component {
+    constructor(props) {        	super(props);        	this.state = { isLoggedIn:false, redirect: false };      };
+    handleInn    = () => { this.setState( { isLoggedIn:true,  redirect: false } );  };
+    handleOut    = () => { this.setState( { isLoggedIn:false, redirect: true } ); };
+    //handleOut  = () => { this.setState( { isLoggedIn:false } );  this.props.history.push('/'); }
+    //handleOut  = () => { this.props.history.push('/'); this.setState( { isLoggedIn:false} );      }
+    //handleOut  = () => { this.props.history.push('/');        }
+    renderRedirect = () => { if (this.state.redirect) { return <Redirect to='/' />  }  else  { return <Redirect to='/hiree/main2' /> } };
+    render() {	
+
+//<Hkbtndanger> <Link to='/main'>  ESG Main    </Link> </Hkbtndanger>
+//	     <Route   path="/main"  render={ ()=>(<ESGMainContainer onClick={()=>this.handleOut()} />) }  />
+//	     <Route   path="/main" render={ ()=> <Redirect to='/' />} />
+	const mainConsole = this.state.isLoggedIn ?
+	    (
+<Mainground>  
+<Header>
+<Hkbtndanger> <Link to='/hiree'> Hiree </Link> </Hkbtndanger>
+<Hkbtndanger> <Link to='/hirer'> Hirer </Link> </Hkbtndanger>
+<Hkbtndanger onClick={this.handleOut}> Logout  </Hkbtndanger>
+</Header>
+
+<Hhr />
+	     <Route exact path="/"  render={ ()=>(<BinaryContainer/>) } /> 
+             <Route   path="/hiree"  component={HireeContainer} />
+             <Route   path="/hirer"  component={HirerContainer} /> 
+</Mainground> 
+	     ) :  ( 
+<div>
+	     <Route exact path="/"  render={ ()=>(<ESGLoginContainer onClick={this.handleInn}/>) } />
+	     <Route   path="/hiree" render={ ()=> <Redirect to='/' />} />
+	     <Route   path="/hirer" render={ ()=> <Redirect to='/' />} />
+</div>
+	      );
+
+	return ( <div> 
+		 { this.renderRedirect() }
+		 {mainConsole} 
+		 </div> );
+    }
+}
+
+// withRouter(App) should be inside <BrowserRouter>
+// and <Provider store={store}> should be also inside <BrowserRouter>
+const Apphk = withRouter(App);
+
+const WrappedApp = () => (
+	    <BrowserRouter>
+                 <Provider store={store}>  
+	    <Apphk />  
+	    </Provider> 
+	    </BrowserRouter> );
+
+export default WrappedApp;
+
+//////////////////////////////////////////
+//const Appheader  = styled.div` background-color: hotpink; text-align: center;`;
+//const Apptopnav  = styled.div` overflow: hidden;    background-color: #333;`;
+//const Apptopnava = styled.a`   float: left;color: #f2f2f2;text-align: center;padding: 14px 16px;text-decoration: none;font-size: 17px;
+//&:hover {    background-color: #ddd;    color: black;  }
+//`;
+//const Apptopnavaright  = Apptopnava.extend`float: right;`;
+//const AppHeaderSection = (props) => (
+//<Appheader>
+//<Apptopnav>  
+//<Apptopnava>      <Link to='/temp'>  First Page </Link> </Apptopnava>  
+//<Apptopnava>      <Link to='/login'> ESG Login </Link> </Apptopnava>  
+//<Apptopnava>      <Link to='/main'>  ESG Main </Link> </Apptopnava>  
+//<Apptopnavaright> <Link to='/test'> Second Page </Link> </Apptopnavaright>  
+//</Apptopnav>
+//</Appheader>
+// );
+

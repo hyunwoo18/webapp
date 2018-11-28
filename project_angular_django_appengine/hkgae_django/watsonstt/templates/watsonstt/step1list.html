@@ -1,0 +1,23 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+<h3> Make sure the following is the current credential that you are using</h3>
+
+<ul>
+{% for cred in credlist %}
+     <li>{{ cred.hkcred }} -- {{ cred.hkpawd }}  </li>
+{% endfor %}
+</ul>
+
+
+<hr>
+
+<h1> <a href="{% url 'watson:step1form' %}"> If you want to upload a new credential, click this</a>  </h1> 
+<br>
+
+<h1>  <a href="{% url 'watson:step2form' %}"> If your credential is listed here and want to proceed to next step, click this</a> </h1> 
+<hr>
+
+
+{% endblock %}
+

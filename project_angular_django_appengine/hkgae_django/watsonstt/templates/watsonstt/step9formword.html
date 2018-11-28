@@ -1,0 +1,23 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+<form action="/watson/step9formword/" method="post">
+    {% csrf_token %}
+
+<h3> Enter the word you want to add and also how you want it to display as </h3>
+<h3> (Do not click the submit button below until all are entered. </h3>
+    {{ wordform }}
+    <hr>
+
+
+<h3> Enter up to 3 sounds_like. </h3>
+<h3> If less than 3 sounds_like, leave the blanks empty and click on the "Delete" button  </h3>
+<h3> If you want more than 3 sounds_like, enter 3 here and add more later. </h3>
+    <table>
+        {{ soundform }}
+    </table>
+
+    <input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

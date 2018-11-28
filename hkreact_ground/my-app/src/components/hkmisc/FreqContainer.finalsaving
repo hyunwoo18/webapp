@@ -1,0 +1,279 @@
+import React, { Component } from 'react';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
+import fire   from './fire';
+import Header from './Header';
+import hat from './images/hat.jpg';
+import ReactDOMServer from 'react-dom/server';
+const fetch = require("node-fetch");
+var divStyle = {    'borderStyle': 'solid',    'borderWitdh': '5px' };
+
+function Mycomp(props) {
+    const sidebar = (
+<dl>
+<dd className="clear"></dd>
+<dt> Basic </dt>
+<dd> Name: {props.limObject.name} </dd>
+
+<dd className="clear"></dd>
+<dt> Current </dt>
+<dd> Company: {props.limObject.current} </dd>
+
+<dd className="clear"></dd>
+<dt> Experience </dt>
+<dd>
+{ props.limObject.past.map( (item,i) => { return (<div style={divStyle}> <h2> {item.title} <span>{item.period}</span> </h2><p>{item.description}</p> </div> );})}
+</dd>
+</dl>   );
+    return (    <div>    {sidebar}    </div> );
+}
+
+class FreqContainer extends Component {
+    constructor(props) {
+	super(props);
+	// current
+	this.showResume     = this.showResume.bind(this);
+	this.handleRequest   = this.handleRequest.bind(this);
+	this.handleResponse  = this.handleResponse.bind(this);
+	// experimental
+	this.myRef = React.createRef();
+	this.showUser       = this.showUser.bind(this);
+	this.hkRender       = this.hkRender.bind(this);
+	this.postData       = this.postData.bind(this);
+
+	this.state = {user: null, userid: null, myCopy: null, requestbool: false, responsebool: false, 
+		      myRequest: null,  myusers: {name:"dummy"}, 
+		      //inviterKey: null, inviteeKey: null, inviterId:null, inviteObj: null,
+		      myFriends: [{name:"dummy"}], myPendings: [{name:"dummy"}]
+	};
+    }
+    componentDidMount() {
+        fire.auth().onAuthStateChanged(  user => {
+                if (user) {
+		    this.setState( { user             } );
+		    this.setState( { userid: user.uid } );
+
+		    fire.database().ref(  'users/' + user.uid  ).on('value', snapshot => {
+			    if ( snapshot.val() ) { console.log( snapshot.val() ); } else { console.log( "no resume" ); }
+			});
+
+		    let userlist;
+		    var hkref = fire.database().ref( 'users/' );
+		    hkref.once( 'value', snapshot => {
+			    if ( snapshot.val() ) {
+				const local_object = snapshot.val();
+				this.setState( { myusers: local_object } );
+				console.log( this.state.myusers );
+			    }
+			});
+
+	//////////////////////////////////////////////////////
+        fire.database().ref(  'users/' + this.state.user.uid + '/friendrequests'  ).on('value', snapshot => {
+
+		snapshot.forEach(  childSnapshot => {
+		    //let localKey = Object.keys( snapshot.val() )[0];
+
+		    let localKey = childSnapshot.key;
+		    console.log( "there is a key 1" );
+		    console.log( localKey );
+		    console.log( "there is a key 2" );
+
+		    let localObj = childSnapshot.val();
+
+		    if ( localObj.answer == 'maybe' &&  this.state.userid != localObj.inviter ) {
+			//this.setState( {inviteeKey: localKey } );
+			//this.setState( {inviterKey: localObj.inviterkey } );
+			//this.setState( {inviterId:  localObj.inviter } );
+			//this.setState( {inviteObj: localObj } );
+			this.setState( {responsebool: true } );
+
+			var hkref = fire.database().ref( 'users/' + localObj.invitee);
+			hkref.once( 'value', snapshot => {
+				if ( snapshot.val() ) {
+				    let newarray = this.state.myPendings.slice();
+
+				    let newObj = snapshot.val();
+				    newObj.inviteeKey = localKey;
+				    newObj.inviterKey = localObj.inviterkey;
+				    newObj.inviter    = localObj.inviter;
+				    newarray.push( newObj );
+				    this.setState(  { myPendings : newarray } );
+				}
+			    } );
+
+		    } else if ( (localObj.answer == 'yes') &&  (this.state.userid == localObj.inviter))  {
+
+			var hkref = fire.database().ref( 'users/' + localObj.invitee);
+			hkref.once( 'value', snapshot => {
+				if ( snapshot.val() ) {
+				    let newarray = this.state.myFriends.slice();
+				    newarray.push( snapshot.val() );
+				    this.setState(  { myFriends : newarray } );
+				}
+			    } );
+		    } else if ( (localObj.answer == 'yes') &&  (this.state.userid == localObj.invitee) ) {
+			var hkref = fire.database().ref( 'users/' + localObj.inviter);
+			hkref.once( 'value', snapshot => {
+				if ( snapshot.val() ) {
+				    let newarray = this.state.myFriends.slice();
+				    newarray.push( snapshot.val() );
+				    this.setState(  { myFriends : newarray } );
+				}
+			    } );
+		    }
+
+
+		    }); // end of forEach
+
+	    }); 
+
+
+		} else { console.log( "new user?" ); this.props.history.push('/login'); }
+	    } );
+
+
+    };
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // these 2 functions are overridden by showResume that uses a state, a functional component
+    hkRender = ( hkobject ) => {  	return ReactDOMServer.renderToStaticMarkup( <div> <h3> {hkobject.name} </h3> </div> ) ;    }
+    showUser( hkkey, hkobject ) {  
+	const hknode = this.myRef.current;
+	hknode.innerHTML = this.hkRender( hkobject );
+    }
+    postData = (url, data) => {
+	return fetch( url, { body: JSON.stringify(data),  headers: { 'content-Type': 'application/json' }, method: 'POST' } )
+    };
+    handleRequest(param) {
+	var hkref = fire.database().ref( 'users/' + this.state.userid + '/friendrequests');
+	var newrequest = hkref.push();
+
+        var uploadarray2 = {
+	    inviter: this.state.userid,
+	    invitee: param,
+	    inviterkey: newrequest.key,
+	    answer: 'maybe',
+	    level: 1
+	};
+
+	newrequest.set( uploadarray2 );
+
+	this.postData('https://us-central1-hkact1-22444.cloudfunctions.net/hkHello', uploadarray2 )
+	    .then(   data => console.log(   data  )  )
+	     .catch( error => console.error( error )  )
+		 
+        console.log( param );
+    };
+
+    showResume( hkkey, hkobject ) {  
+	this.setState(  {myCopy: <Mycomp limObject={hkobject} /> } );
+
+	this.setState(  {requestbool: true } );
+	this.setState(  {myRequest: hkkey } );
+	// the following did not work because seemingly the page produced was static, i.e. event handler did not get activated..
+	//const hkButton = ( <Button bsStyle="primary" onClick={ this.handleRequest.bind(this, hkkey) }> Friend Request </Button> );
+        //this.setState(  {myButton: hkButton } );
+	//<div dangerouslySetInnerHTML={ {__html: ReactDOMServer.renderToStaticMarkup( this.state.myButton ) } } >   </div>
+	//  <p onClick={this.showUser.bind(this, key, this.state.myusers[key] ) }> 
+	// <div ref={this.myRef}>
+    }
+    handleResponse( inviteeKey, inviterKey, inviterId,  param_answer ) {
+
+	// important:: to do is
+	// after this uploading, myPendings must subtract the current entry...
+
+
+	var hkref = fire.database().ref( 'users/' + this.state.userid + '/friendrequests/' + inviteeKey );
+	hkref.update(  {answer: param_answer } );
+
+	// have to upload a different data to the second URL (of FB function)
+	// answer = 'yes' or 'no'
+	// the original inviter's request id = this.state.resKey
+	let answer2 = {
+	    inviter:    inviterId,
+	    inviterkey: inviterKey,
+	    answer: param_answer
+	};
+
+	this.postData('https://us-central1-hkact1-22444.cloudfunctions.net/hkResponse', answer2 )
+	    .then(   data => console.log(   data  )  )
+	    .catch( error => console.error( error )  )
+
+	this.setState(  {responsebool: false }    );
+        console.log( param_answer );
+    };
+
+
+
+    /////////////////////////////////
+    render() {	
+
+return (
+
+<div>
+
+<Header> <Button bsStyle="primary" onClick={this.handleLogout}> Logout </Button> </Header>
+
+    {/* ================================================ */}
+<Grid fluid={true} className="text-center"> <Row>
+
+    {/* ========= LEFT ======================================= */}
+<Col sm={2} className="well">
+<div className="well">
+
+    { Object.keys( this.state.myusers ).map( (key, id) => {  
+	if ( this.state.userid != key) {
+	    return (
+  <p onClick={this.showResume.bind(this, key, this.state.myusers[key])}>  
+  <a href="#">  {this.state.myusers[key].name} ( {this.state.myusers[key].current} ) </a>  </p>   
+		    );
+	}
+	    } ) }
+<h3> Friends </h3>
+
+    { Object.keys( this.state.myFriends ).map( (key, id) => {  
+		if ( this.state.myFriends[key].name != "dummy" ) {
+	return ( <p> {this.state.myFriends[key].name} ( {this.state.myFriends[key].current} ) </p>  );
+		}
+	    }  ) }
+
+</div>
+</Col>
+
+
+    {/* ========== MAIN ====================================== */}
+<Col sm={7} className="page-wrap">
+<div>
+<div dangerouslySetInnerHTML={ {__html: ReactDOMServer.renderToStaticMarkup( this.state.myCopy ) } } />   
+
+{this.state.requestbool && <Button bsStyle="primary" onClick={ this.handleRequest.bind(this, this.state.myRequest) }> Friend Request </Button>}
+</div>
+</Col>
+
+    {/* ================ RIGHT ================================ */}
+<Col sm={2} className="well">
+
+<div className="well">    
+
+    { Object.keys( this.state.myPendings ).map( (key, id) => {  
+		if ( this.state.myPendings[key].name != "dummy" ) {
+		    let locInviteeKey = this.state.myPendings[key].inviteeKey;
+		    let locInviterKey = this.state.myPendings[key].inviterKey;
+		    let locInviterId  = this.state.myPendings[key].inviter;
+	return ( 
+<div className="well">    
+<p> {this.state.myPendings[key].name} ( {this.state.myPendings[key].current} ) </p>  
+<Button bsStyle="primary" onClick={ this.handleResponse.bind(this, locInviteeKey, locInviterKey, locInviterId, 'yes') }> Accept </Button> 
+      <Button bsStyle="warning" onClick={ this.handleResponse.bind(this, 'no' ) }> Decline </Button>
+</div>
+);
+		}
+	    }  ) }
+
+</div>
+
+</Col>
+    {/* ================================================ */}
+</Row> </Grid>  </div>
+			);    }
+}
+
+export default FreqContainer;

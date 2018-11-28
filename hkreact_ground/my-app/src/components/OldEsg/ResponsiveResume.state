@@ -1,0 +1,257 @@
+import React, { Component } from 'react';
+//import * as firebase from 'firebase';
+import styled from 'styled-components';
+//import { Route, Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import { connect }            from 'react-redux';
+//import ModalContainer from './ModalContainer';
+//import {Hkbtndanger} from './ESGMainContainer';
+
+
+///////////// new resume start
+const StyledCheckout=styled.div` margin:auto; background: transparent; width: 80%; `;
+// <PaymentForm onSubmit={props.paySubmit} />
+
+//const Checkout = (props) => (      <StyledCheckout>      <WorkExperience {...props} />      </StyledCheckout>  );
+const Checkout = (props) => ( <div>  <ResponsiveResume {...props} />  </div>  );
+
+const mapStateToCheckoutProps    = (state)    => ( { myresume: state.myresume, } );
+const mapDispatchToCheckoutProps = (dispatch) => ( { onMessageClick: (resume) => ( dispatch( updateResume(resume) )  ), } );
+function updateResume(resume) {    return { type: 'UPDATE_RESUME',  myresume: resume, };   }
+const ResumeContainer = connect( mapStateToCheckoutProps, mapDispatchToCheckoutProps )( Checkout );
+
+///////// PaymentForm materials 
+const Ritle=styled.div` font-family: 'Playfair Display';font-size: 18px;padding: 20px; `;
+
+const BasicInputStyled = styled.div` text-align: center;    padding: 0 20px;  margin-bottom: 20px;
+label {    display: block;    text-transform: uppercase;    margin-bottom: 5px;    font-size: 11px;    font-weight: 600; }
+input {
+    width: 100%;    border: 0;    border-bottom: 1px solid #17183B;    font-family: 'Lato', sans-serif;    padding: 5px 0;
+    font-size: 18px;    font-weight: 300;    outline: none;
+    &:focus { border-bottom: 1px solid #FFB49A; }
+}
+textarea {
+    width: 100%;    border: 0;    border-bottom: 1px solid #17183B;    font-family: 'Lato', sans-serif;    padding: 5px 0;
+    font-size: 18px;    font-weight: 300;    outline: none;
+    &:focus { border-bottom: 1px solid #FFB49A; }
+} `;
+const JkInputStyled = styled.div`  border-style: solid;  border-color: red; `;
+
+class ResponsiveResume extends Component {
+    constructor(props) {
+        super(props);
+	//this.jkinputs = this.props.myresume.workarray;
+	this.jkfname   = this.props.myresume.fname;
+	this.jklname   = this.props.myresume.lname;
+	this.jkcompy   = this.props.myresume.company;
+
+	this.fnameRef = null;
+	this.lnameRef = null;
+	this.compyRef = null;
+	//this.state = { redirect: false }; // just for the purpose of implementing a redirect
+	this.state = { redirect: false, jkinputs:this.props.myresume.workarray }; // just for the purpose of implementing a redirect
+
+	this.handleDel = this.handleDel.bind(this);
+    }
+    componentDidMount() {
+	console.log( "checking states" );
+	console.log( this.props.myresume );
+	//this.jkinputs = this.state.jkinputs;
+    }
+
+    baseSave = () => {
+	//console.log( "name" );	console.log( this.fnameRef.value );	console.log( "company" );	console.log( this.compyRef.value );
+	//hkarray.forEach( (i) => { 		console.log( i.periodRef.value ); 		console.log( i.titleRef.value );    } );
+	const result = this.state.jkinputs.map( (jkinput, id) => ( {period: jkinput.periodRef.value, title: jkinput.titleRef.value} ) );
+	let tempresume = { fname: this.fnameRef.value,  lname: this.lnameRef.value,     company: this.compyRef.value, workarray: result }
+
+	this.props.onMessageClick( tempresume );
+    }
+
+    baseSave2 = (jkarray) => {
+	const result = jkarray.map( (jkinput, id) => ( {period: jkinput.periodRef.value, title: jkinput.titleRef.value} ) );
+	let tempresume = { fname: this.fnameRef.value,  lname: this.lnameRef.value,     company: this.compyRef.value, workarray: result }
+	this.props.onMessageClick( tempresume );
+    }
+
+    submitClick = () => {
+	this.baseSave();
+	this.setState( {redirect: true}  );
+    }
+
+    handleAdd = ( ) => {
+	console.log("inside Add start" );
+	//	console.log( this.jkinputs );
+	let tempinput= {period: null, title: null};
+	//this.jkinputs.push( tempinput );
+	//this.setState( {jkinputs:this.jkinputs}  );
+
+	console.log("inside Add end" );
+
+	let newarray = this.state.jkinputs.slice();
+        newarray.push( tempinput )
+	//this.baseSave();
+
+        this.setState(  { jkinputs: newarray } );
+	this.forceUpdate();
+    };
+
+    handleDel = ( id ) => {
+	console.log( "fking in = " );
+	console.log( id );
+	//console.log( this.jkinputs );
+	console.log("is this being called??" );
+
+        let newarray2 = [...this.state.jkinputs];
+	console.log("before" );
+	console.log( newarray2 );
+	var removed = newarray2.splice( id, 1 );
+	console.log( removed );
+	console.log("after" );
+	console.log( newarray2 );
+	this.baseSave2( newarray2 );
+        //this.setState(  { jkinputs: newarray2 } );
+
+	//let tempinputs = this.jkinputs.splice( id, 1 );
+	//this.setState( {jkinputs:tempinputs}  );
+	//console.log("is this being called 2??" );
+	console.log("is this a mystery?" );
+
+        this.setState(  { jkinputs: this.props.myresume.workarray } );
+	console.log( this.state.jkinputs );
+
+	this.forceUpdate();
+    };
+    renderRedirect = () => {	if (this.state.redirect) {	    return <Redirect to='/temp/main3' />	}    }
+
+    render() {
+	///////////////////////////////////
+	//<HiddenRow innerRef={this.modalref}>
+//<Row><Col25> <Label for="fname">Current Company</Label></Col25><Col75> <Input type="text" id="fname" name="firstname" placeholder="Current Company" /></Col75></Row>
+	//</HiddenRow>
+	//	const raul = this.jkinputs.map( (jkinput, id) => { 	//		return ( 	//<div>
+	//<Jkinput periodVal={jkinput.period} titleVal={jkinput.title} refPeriod={elem => jkinput.periodRef=elem} refTitle={elem => jkinput.titleRef=elem} /> 
+	//<button type="button" onClick={ () => this.handleDel( id ) }> Delete </button>
+	//</div>  	//			 ); } );
+
+	//class Jkinput extends Component {    render () {  return (
+	//<JkInputStyled>
+	// <BaseInput value={this.props.periodVal} testref={this.props.refPeriod} name="period" label="Period" type="text" placeholder="John Smith" />
+	// <BaseInput value={this.props.titleVal}  testref={this.props.refTitle}  name="title"  label="Title"  type="text" placeholder="Apple" />
+	//</JkInputStyled>
+	//   ) ;	}	//}
+    const raul = this.state.jkinputs.map( (jkinput, id) => {	    return (
+<fieldset key={id}>
+<legend> Past </legend>
+
+<Row><Col25> <Label for="period">Period</Label></Col25> 
+<Col75> <Input type="text" id="fname" name="period" defaultValue={jkinput.period} innerRef={el=>jkinput.periodRef=el} placeholder="Period" /></Col75></Row>
+
+<Row><Col25> <Label for="titlee">Titlee</Label></Col25> 
+<Col75> <Input type="text" id="fname" name="compan" defaultValue={jkinput.title}  innerRef={el=>jkinput.titleRef=el}  placeholder="Title " /></Col75></Row>
+<Row> <button type="button" onClick={ ()=>this.handleDel(id) }> Delete </button>   </Row>
+</fieldset>		    ); } );
+    //////////////////////////////////////////////////////////
+	return (
+<Container>  {this.renderRedirect()}  <form>   <h1> Basic Information </h1>
+
+<Row><Col25> <Label for="fname">First Name</Label></Col25>
+<Col75>  <Input type="text" name="fname" defaultValue={this.jkfname} innerRef={el=>this.fnameRef=el} placeholder="Your first name" /></Col75></Row>
+
+<Row><Col25> <Label for="fname">Last  Name</Label></Col25>
+<Col75>  <Input type="text" name="lname" defaultValue={this.jklname} innerRef={el=>this.lnameRef=el} placeholder="Your lirst name" /></Col75></Row>
+
+<Row><Col25> <Label for="fname">CurCompany</Label></Col25>
+<Col75>  <Input type="text" name="compy" defaultValue={this.jkcompy} innerRef={el=>this.compyRef=el} placeholder="Your compy name" /></Col75></Row>
+
+<h1> Career Information <Span onClick={()=>this.handleAdd()}>Add</Span>  </h1>
+    {raul}
+
+<Row> <CheckoutButton  onClick={ ()=>this.submitClick() } /> </Row>
+
+</form> </Container> );
+	//	return (		<div>		{this.renderRedirect()}
+	// <Formleft>  <Ritle>Your resume information</Ritle>  <h3> Basic Information </h3> 
+	//<BaseInput value={this.jkname} testref={elem=>this.nameRef=elem} name="name"    label="Name" type="text" placeholder="John" />
+	//<BaseInput value={this.jkcmpy} testref={elem=>this.cmpyRef=elem} name="company" label="Company"type="text" placeholder="Apple" />
+	//<Tempdiv>   	//<h3> Work Experience </h3> <HeroButton2 primary={true} text="Add"  onClick={ ()=>this.handleAdd() } /> </Tempdiv>
+	//	{raul}
+	//</Formleft>
+	// <CheckoutButton  onClick={ ()=>this.submitClick(this.jkinputs) } /> </div>  );  }
+    }
+}
+
+const BaseInput = (props) => (
+<BasicInputStyled>
+<label htmlFor={props.name}>  {props.label}  </label>
+<input id={props.name}  defaultValue={props.value} type={props.type} ref={props.testref} placeholder={props.placeholder} />
+</BasicInputStyled>     );
+
+
+const Formleft = styled.form`    text-align: left; `;
+
+//<Hkbtndanger onClick={()=>this.handleAdd()}>Add</Hkbtndanger>  
+const Button2 = styled.button`    background: transparent;
+display: table-cell;height: 44px;width: 100px;color: red;margin-left:10px;margin-bottom:10px;box-sizing: border-box;border: 2px solid rgba(245, 245, 241, 0.2);
+font-size: 14px;font-weight: 500;transition: border .125s ease, background .125s ease;
+&:hover                      { border: 2px solid #f5f5f1; }
+&[data-primary='true']       { border: 2px solid #e50914; }
+&[data-primary='true']:hover {    background: #e50914; }
+`;
+
+class HeroButton2 extends Component {
+    render() {    return (   <Button2 data-primary={this.props.primary} onClick={this.props.onClick}>{this.props.text}</Button2>  );    }
+}
+const Tempdiv = styled.div`    display: table; & h3 {    display: table-cell; } `;
+
+/// part 3
+const CheckoutButton = (props) => (
+ <CheckoutButtonStyled>  <button type="button" onClick={props.onClick} >Submit your resume</button>  </CheckoutButtonStyled> );
+const CheckoutButtonStyled = styled.div`     padding: 0 20px; text-align: center;
+button {
+    background: #ffa181;    color: white;    border: 0;    border-radius: 2px;    font-family: 'Lato', sans-serif;
+    width: 100%;    font-size: 13px;    text-transform: uppercase;    font-weight: 300;    outline: none;    padding: 10px 0;
+    margin-bottom: 10px;
+    &:hover {	background: #ff8e67;    }
+    &:active {        -webkit-transform: scale(0.99);        transform: scale(0.99);    }
+}
+span { font-size: 11px; color: #bfbfbf;    font-weight: 300;    text-align: center;}
+`;
+
+
+// wmoore
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+const HiddenRow = styled.div`  display: none; `;
+const Row = styled.div`        display: flex;    flex-wrap: wrap;    margin: 0 -16px; `;
+const Col = styled.div`  padding: 0 16px; `;
+const Col25 = Col.extend` flex: 25%; `;
+const Col50 = Col.extend` flex: 50%; `;
+const Col75 = Col.extend` flex: 75%; `;
+
+const Container  = styled.div`     border-radius: 5px;    background-color: #f2f2f2;    padding: 20px; 
+& h1 { text-align: left}
+`;
+
+const Label = styled.label`     padding: 12px 12px 12px 0;    display: inline-block; `;
+const Input = styled.input`     width: 100%;padding: 12px;border: 1px solid #ccc;border-radius: 4px;resize: vertical; `;
+
+//<Row> <Submit type="submit" value="Submit" /> </Row>
+const Submit = styled.input`    background-color: #4CAF50;color: white;padding: 12px 20px;border: none;border-radius: 4px;cursor: pointer;float: right; `;
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+const Span = styled.span` display:inline-block; border: 1px solid red; padding: 2px 4px; &:hover {background-color:red; color:black;} `;
+
+//class ResponsiveResume extends Component {    
+//    constructor(props) {        super(props);        this.modalref = React.createRef();
+//        this.handleModal = this.handleModal.bind(this);	this.jkinputs = [ {period: "1970", title: "engineer"}, {period: "1987", title: "TaeRee"} ];    }
+//    handleModal = () => { this.modalref.current.style.display='block';    };
+//   handleDel = (id) => { this.jkinputs = this.jkinputs.splice( id, 1 );  this.forceUpdate();  };
+//render() {
+//return (   );  
+//}
+//}
+
+//export default ResponsiveResume;
+export default ResumeContainer;

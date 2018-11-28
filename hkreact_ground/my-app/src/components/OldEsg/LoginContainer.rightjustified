@@ -1,0 +1,51 @@
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
+
+    render() {
+	    return (
+
+      <div id="navigation" className="Navigation">
+
+		    <Navbar inverse>
+
+		    <Navbar.Header>		       <Navbar.Brand>RDG</Navbar.Brand>		    </Navbar.Header>
+
+		    <Nav>
+		    <NavItem>		    Link		    </NavItem>
+		    </Nav>
+
+		    <Nav pullRight>
+
+		    <form className="navbar-form navbar-right" role="form"  onSubmit={this.handleSubmit}>
+                    <div>
+                        <div className="input-group">
+                            <span className="input-group-addon"><i className="glyphicon glyphicon-user"></i></span>
+		            <input id="email" type="email" onChange={this.handleEmailChange} className="form-control" name="email" placeholder="Email Address" />
+                        </div>
+                        <div className="input-group">
+                            <span className="input-group-addon"><i className="glyphicon glyphicon-lock"></i></span>
+                           <input id="password" type="password" onChange={this.handlePasswordChange} className="form-control" name="password" placeholder="Password"/ >
+                        </div>
+                        <button type="submit" className="btn btn-primary">Login</button>
+                   </div>
+                   </form>
+		    </Nav>
+
+
+		    </Navbar>
+
+</div>
+		    );
+    }
+}
+
+class LoginContainer extends Component {
+    render() {
+	return (
+		<header className="Header">
+		   <UserLogin onLogin={this.onLogin}/>
+		</header>
+		
+		<Hero />
+		);
+    }
+}

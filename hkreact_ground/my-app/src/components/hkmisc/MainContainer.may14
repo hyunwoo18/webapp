@@ -1,0 +1,147 @@
+import React, { Component } from 'react';
+import fire from './fire';
+import Header from './Header';
+class MainContainer extends Component {
+
+    state = { user: null, hkname:'',   hkcurrent:'',   resumebool: false,     
+	      name_editing: false, current_editing:false,
+	      hkinputs: ['first'],
+	      name: '',           company: ''      };
+
+    componentDidMount() {
+        fire.auth().onAuthStateChanged(  user => {
+                if (user) {
+		    console.log( user.uid );
+		    this.setState( { user }  );
+
+		    fire.database().ref(  'users/' + user.uid  ).on('value', snapshot => {
+			    if ( snapshot.val() ) {
+				//this.setState( { resumebool: true } );
+				this.setState( { hkname: snapshot.val().name } );
+				this.setState( { hkcurrent: snapshot.val().current } );
+				console.log( "there is resume" );
+				console.log( snapshot.val() );
+			    } else {				console.log( "no resume" );			    }
+			});
+		} else {
+		    console.log( "new user?" );
+		    this.props.history.push('/login');
+		}
+	    } );
+    };
+
+    //////////////////////////
+    handleLogout = () => {
+	fire.auth().signOut();
+    };
+
+    //////////////////////////
+    handleNameChange = event => {
+	this.setState(  { hkname: event.target.value }  );
+    };
+    handleCurrentChange = event => {
+	this.setState(  { hkcurrent: event.target.value }  );
+    };
+    handleSubmit = event => {
+	event.preventDefault();
+	if ( this.state.hkname && this.state.hkcurrent ) {
+	    this.fireSubmit();
+	} else {
+	    console.log( "error" );
+	}
+    };
+    fireSubmit() {
+        fire.database().ref(  'users/' + this.state.user.uid  ).set(  { name: this.state.hkname, current: this.state.hkcurrent  } );
+    };
+    //////////////////////////
+    toggle_name_editing = () => {
+	this.setState( { name_editing: true } );
+    };
+    toggle_current_editing = () => {
+	this.setState( { current_editing: true } );
+    };
+    //handleNameField = (event) => {
+    //if ( event.keyCode === 13 ) {
+    //    console.log( "name field change requested by key" );
+    //    fire.database().ref(  'users/' + this.state.user.uid  ).update(  { name: event.target.value }  );
+    //}
+    //};
+    handleNameTotal = () => {
+	console.log( "name field change requested by button" );
+	fire.database().ref(  'users/' + this.state.user.uid  ).update(  { name: this.refs['name'].value }  );
+	this.setState( { name_editing: false } );
+    };
+    handleCurrentTotal = () => {
+	fire.database().ref(  'users/' + this.state.user.uid  ).update(  { current: this.refs['current'].value }  );
+	this.setState( { current_editing: false } );
+    };
+    render_name = () => {
+	if ( this.state.name_editing ) {
+	    //return ( <div> <input onKeyDown={this.handleNameField} type="text" name="name" defaultValue={ this.state.hkname } ref={ 'name'}  />  
+	    return ( <div> <input type="text" name="name" defaultValue={ this.state.hkname } ref={ 'name'}  />  
+		     <button className="red light" type="submit" onClick={this.handleNameTotal}>   Submit a change   </button> </div>  );
+	} else {
+	    return (   <h3 onClick={this.toggle_name_editing} > Name:  { this.state.hkname}      </h3>       )
+	}
+    };
+
+    render_current = () => {
+	if ( this.state.current_editing ) {
+	    return ( <div> <input  type="text" name="current" defaultValue={ this.state.hkcurrent } ref={ 'current'}  />  
+		     <button className="red light" type="submit" onClick={this.handleCurrentTotal}>   Submit a change   </button> </div>  );
+	} else {
+	    return (   <h3 onClick={this.toggle_current_editing} > Current Position:  { this.state.hkcurrent} </h3>      )
+	}
+
+    };
+
+    handleAdd = () => {
+        let newarray = this.state.hkinputs.slice();
+        newarray.push( 'third' )
+        this.setState(  { hkinputs: newarray } );
+    };
+
+    handleDel = (param) => {
+        console.log( param );
+        console.log( this.state.hkinputs );
+        let newarray2 = [...this.state.hkinputs];
+        newarray2.splice( param, 1 );
+        console.log( newarray2 );
+        this.setState(  { hkinputs: newarray2 } );
+    };
+
+    /////////////////////////////////
+    render() {
+	return (
+            <div id="UserContainer" className="inner-container">
+                <Header>                <button className="red" onClick={this.handleLogout}>            Logout          </button>                </Header>
+
+	    { this.state.resumebool ? 
+		    ( 
+<div>
+<div> {this.render_name()}</div>
+<div> {this.render_current()} </div>
+</div>
+		      ) : (
+<div>
+                        <form onSubmit={this.handleSubmit}>
+                          <input type="text" onChange={this.handleNameChange}    value={this.state.hkname}    placeholder="Your Name"          />
+                          <input type="text" onChange={this.handleCurrentChange} value={this.state.hkcurrent} placeholder="Your Current Position" />
+                          <button className="red light" type="submit">   Submit your resume    </button>
+
+  { this.state.hkinputs.map( (msg, i) => { return (<div> <input type="text" /> <button type="button" onClick={ this.handleDel.bind( this,i) }> Del </button> </div>) } ) }
+
+                       </form>
+
+			<button onClick={this.handleAdd}>
+                        Add
+                        </button>
+</div>
+
+	       )  }
+            </div>
+	);
+    }
+}
+
+export default MainContainer;

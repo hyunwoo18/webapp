@@ -1,0 +1,53 @@
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+
+import { Route, withRouter } from 'react-router-dom';
+import { Button, FormGroup, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap';
+
+class LoginContainer extends Component {
+
+  state = { email: '', password: '', error: '' };
+
+  render() {
+    return (
+      <div id="LoginContainer"  className="inner-container">
+
+
+      <form>
+        <FormGroup controlId="formBasicText">
+          <ControlLabel>Working example with validation</ControlLabel>
+          <FormControl
+            type="text"
+            placeholder="Enter text"
+          />
+          <FormControl.Feedback />
+          <HelpBlock>Validation is based on string length.</HelpBlock>
+        </FormGroup>
+
+
+        <FormGroup controlId="formBasicText">
+          <ControlLabel>Working example with validation</ControlLabel>
+          <FormControl
+            type="text"
+            placeholder="Enter Passsord"
+          />
+          <FormControl.Feedback />
+          <HelpBlock>Validation is based on string length.</HelpBlock>
+        </FormGroup>
+
+          <p>Sign in or sign up by entering your email and password.</p>
+
+          <Link to="/">
+      <Button bsStyle="danger">Login (to chat)</Button>  
+          </Link>
+
+
+      </form>
+
+      </div>
+
+    );
+  }
+}
+
+export default LoginContainer;

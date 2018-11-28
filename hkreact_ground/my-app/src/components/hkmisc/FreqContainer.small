@@ -1,0 +1,16 @@
+import React, { Component } from 'react';
+//import { Button, Grid, Row, Col } from 'react-bootstrap';
+//import fire   from './fire';
+//import Header from './Header';
+//import hat from './images/hat.jpg';
+import ReactDOMServer from 'react-dom/server';
+//const fetch = require("node-fetch");
+//var divStyle = {    'borderStyle': 'solid',    'borderWitdh': '5px' };
+
+class FreqContainer extends Component {
+    render() {
+	return <h1>Hello18  {this.props.fuser.uid} </h1>;
+    }
+}
+
+export default FreqContainer;

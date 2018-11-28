@@ -1,0 +1,112 @@
+import React, { Component } from 'react';
+import fire from './fire';
+import firebase from 'firebase';
+import Header from './Header';
+//import ReactDOM from 'react-dom';
+
+class MainContainer extends Component {
+
+    state = { user: null,  hkname:'',   hkcomp:'',   resumebool: false,     name_editing: false,       name: '',           company: ''      };
+
+    componentDidMount() {
+	fire.auth().setPersistence( 'local' ).then( function() { console.log("persistence success"); } );
+	//var localuser = this.props.propuser;
+	const localuser = fire.auth().currentUser;
+	console.log( localuser.uid );
+	fire.database().ref(  'users/' + localuser.uid  ).once('value', snapshot => {
+		if ( snapshot.val() ) {
+		    this.setState( { resumebool: true } );
+		    this.setState( { hkname: snapshot.val().name } );
+		    this.setState( { hkcomp: snapshot.val().company } );
+		    console.log( "there is resume" );
+		    console.log( snapshot.val() );
+		} else {
+		    console.log( "no resume" );
+		}
+
+	    });
+
+    };
+
+    //////////////////////////
+    handleLogout = () => {
+	fire.auth().signOut();
+    };
+
+
+    //////////////////////////
+    handleNameChange = event => {
+	console.log( "handle name change" );
+	console.log( event.target.value );
+	this.setState(  { name: event.target.value }  );
+    };
+
+    handleCompChange = event => {
+	console.log( "handle company change" );
+	console.log( event.target.value );
+	this.setState(  { company: event.target.value }  );
+    };
+
+    handleSubmit = event => {
+	event.preventDefault();
+
+	if ( this.state.name && this.state.company ) {
+	    this.HandleSubmit();
+	} else {
+	    console.log( "error" );
+	}
+    };
+
+    HandleSubmit() {
+        fire.database().ref(  'users/' + this.state.user.uid  ).set({
+		name: this.state.name,
+                    company: this.state.company  });
+    }
+    //////////////////////////
+    toggle_name_editing = () => {
+	this.setState( { name_editing: true } );
+    };
+    handleNameField = (event) => {
+	if ( event.keyCode === 13 ) {
+	    console.log( "name field change requested by key" );
+	    fire.database().ref(  'users/' + this.state.user.uid  ).update(  { name: event.target.value }  );
+	}
+    };
+    handleNameTotal = (hktemp) => {
+	console.log( "name field change requested by button" );
+	fire.database().ref(  'users/' + this.state.user.uid  ).update(  { name: this.refs['name'].value }  );
+	this.setState( {name: 'hktemp' } );
+    };
+    render_name = () => {
+	if ( this.state.name_editing ) {
+	    return ( <div> <input onKeyDown={this.handleNameField} type="text" name="name" defaultValue={ this.state.hkname } ref={ 'name'}  />  
+		     <button className="red light" type="submit" onClick={ this.handleNameTotal.bind(null, null) }>   Submit a change   </button> </div>
+		     );
+	} else {
+	    return (   <h3 onClick={this.toggle_name_editing} >  { this.state.hkname}      </h3>       )
+	}
+    };
+
+    /////////////////////////////////
+    render() {
+	return (
+
+      <div id="UserContainer" className="inner-container">
+
+	  { this.state.resumebool ? 
+		    ( this.render_name() 
+
+		      ) : (
+
+                        <form onSubmit={this.handleSubmit}>
+                          <input type="text" onChange={this.handleNameChange} value={this.state.name}    placeholder="Your Name"          />
+                          <input type="text" onChange={this.handleCompChange} value={this.state.company} placeholder="Your Company"       />
+                          <button className="red light" type="submit">   Submit your resume    </button>
+                       </form>
+	       )  }
+      </div>
+	);
+    }
+}
+
+export default MainContainer;

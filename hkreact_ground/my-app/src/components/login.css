@@ -1,0 +1,18 @@
+.login-div {
+#  background: linear-gradient(to bottom, #FD8271 , #A62824);
+#   background-color: coral;
+  font-family: 'Khula', sans-serif;
+  color: #2f2f2f;
+  overflow: hidden;
+  margin: 0 8px;
+}
+
+form {
+     background-color: coral;
+     margin: auto;
+     padding-top: 100px;
+     padding-left: 20px;
+     height: 500px;
+     width:  500px;
+     border: 3px solid #f1f1f1;
+     }

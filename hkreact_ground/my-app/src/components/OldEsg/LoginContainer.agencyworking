@@ -1,0 +1,23 @@
+import React, { Component } from 'react';
+import './agency.css';
+
+class LoginContainer extends Component {
+
+  render() {
+
+    return (
+
+    <header>
+        <div className="container">
+            <div className="intro-text">
+                <div className="intro-lead-in">Welcome To Our Studio!</div>
+                <div className="intro-heading">Its Nice To Meet You</div>
+            </div>
+        </div>
+    </header>
+
+    );
+  }
+}
+
+export default LoginContainer;

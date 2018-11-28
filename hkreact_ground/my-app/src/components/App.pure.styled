@@ -1,0 +1,13 @@
+import React, { Component } from 'react';
+import { Route, withRouter } from 'react-router-dom';
+import StyledContainer from './StyledContainer';
+
+class App extends Component {
+    render() {
+	return ( <div>
+		 <Route    exact   path="/" component={StyledContainer} /> 
+		</div> );
+    }
+}
+
+export default withRouter(App);

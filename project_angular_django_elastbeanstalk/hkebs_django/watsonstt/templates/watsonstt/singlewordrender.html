@@ -1,0 +1,10 @@
+{% extends "watsonstt/base.html" %}
+{% block content %}
+
+<h3> {{ message }} <h3>
+
+<a href="{% url 'watson:start' %}"> Home </a>
+<br>
+<a href="{% url 'watson:singleword' %}"> Do it over </a>
+
+{% endblock %}
