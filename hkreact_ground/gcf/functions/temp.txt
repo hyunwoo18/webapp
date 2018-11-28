@@ -1,6 +1,0 @@
-    { Object.keys( this.state.myusers ).map( (key, id) => { return (
-        {if ({this.state.user.uid} != key) {
-  <p onClick={this.showResume.bind(this, key, this.state.myusers[key])}>
-  <a href="#">  {this.state.myusers[key].name} ( {this.state.myusers[key].current} ) </a>  </p>
-            }}
-                                                                    ) } ) }
